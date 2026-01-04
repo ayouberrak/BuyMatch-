@@ -24,7 +24,7 @@ if ($user) {
         'status' => 'success',
         'message' => 'Compte supprimé avec succès !'
     ]);
-    header('Location: /logout.php');
+    header('Location: / logout.php');
 } else {
     echo json_encode([
         'status' => 'error',

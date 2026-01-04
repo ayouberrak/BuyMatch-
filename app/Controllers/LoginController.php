@@ -1,54 +1,61 @@
 <?php
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 
+require_once __DIR__ . '/../Services/AuthService.php';
+require_once __DIR__ . '/../Repository/UserRepository.php';
 require_once __DIR__ . '/../Models/User.php';
+
 class LoginController
 {
-    public function login($method){
-        if(!empty($method['email']) && !empty($method['password'])){
-            $password = $method['password'];
-            $email = $method['email'];
-            $user = new User();
-            if($userF = $user->login($email, $password)){
-                session_start();
-                // $_SESSION['user'] = $userF['id'];
-                $_SESSION['role'] = $userF['role'];
-                if($userF['role'] === 'admin'){
-                    header('Location: admin.php');
-                     exit();
-                }elseif($userF['role'] === 'organisateur'){
-                    header('Location: organisateur.php');
-                     exit();
-                }else{
-                    header('Location: acheteur.php');
-                     exit();
-                }
-
-            } else {
-                header('Location: LoginController.php?error=1');
-                exit();
-            }
-
-        } else {
-            throw new Exception("Email and password are required.");
+    public function login()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            require_once __DIR__ . '/../Views/auth/conexion.view.php';
+            return;
         }
 
+        if (empty($_POST['email']) || empty($_POST['password'])) {
+            header('Location: /login?error=empty');
+            exit();
+        }
+
+        try {
+            $authService = new AuthService(new UserRepository());
+            $user = $authService->login(
+                $_POST['email'],
+                $_POST['password']
+            );
+
+            session_start();
+            $_SESSION['user_id'] = $user->getId();
+            $_SESSION['role'] = $user->getRole();
+
+            switch ($user->getRole()) {
+                case 'admin':
+                    header('Location: /admin');
+                    break;
+                case 'organisateur':
+                    header('Location: OrganisateurController.php');
+                    break;
+                default:
+                    header('Location: /acheteur');
+            }
+            exit();
+
+        } catch (Exception $e) {
+            header('Location: /login?error=' . urlencode($e->getMessage()));
+            exit();
+        }
     }
 }
 
-$userController = new LoginController();
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userController->login($_POST);
-    exit();
-}
 
-
-
-
-
+$LoginController = new LoginController();
+$LoginController->login();
 
 
 require_once __DIR__ . '/../Views/auth/conexion.view.php';

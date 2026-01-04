@@ -1,12 +1,13 @@
 <?php
 
-use App\Config\Database;
+
 
 require_once __DIR__ . '/../../config/database.php';
 
-class User
+ class User
 {
-    private PDO $db;
+
+    private $id;
     private $name;
     private $email;
     private $password;
@@ -14,10 +15,26 @@ class User
     private $role;
     private $status;
 
-    public function __construct()
+    public function __construct($id = null, $name = null, $email = null, $password = null, $photo = null, $role = null, $status = null)
     {
-        $this->db = Database::getInstance()->getConnection();
+        $this->id = $id;
+        $this->name = $name;
+        $this->email = $email;
+        $this->password = $password;
+        $this->photo = $photo;
+        $this->role = $role;
+        $this->status = $status;
     }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getName()
     {
         return $this->name;
@@ -69,31 +86,4 @@ class User
     }
 
 
-    public function sigupnUp()
-    {
-       $sql = "INSERT INTO users (nom, email, password, image_profil, role, status)
-        VALUES (:name, :email, :password, :photo, :role, :status)";
-        $passwordHash = password_hash($this->password, PASSWORD_BCRYPT);
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':email', $this->email);
-        $stmt->bindParam(':password', $passwordHash);
-        $stmt->bindParam(':photo', $this->photo);
-        $stmt->bindParam(':role', $this->role);
-        $stmt->bindParam(':status', $this->status);
-        return $stmt->execute();
-    }
-
-    public function login($email, $password)
-    {
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (password_verify($password, $user['password'])) {
-            return $user;
-        }
-        return false;
-    }
 }

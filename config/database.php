@@ -1,11 +1,5 @@
 <?php
 
-namespace App\Config;
-
-use PDO;
-use PDOException;
-use Exception;
-
 
 
 $env = parse_ini_file(__DIR__ .'/../.env');

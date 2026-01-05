@@ -10,6 +10,9 @@ require_once __DIR__ . '/../Repository/UserRepository.php';
 require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
 // require_once __DIR__ . '/../api/updateProfile.php';
 
+
+// require_once __DIR__ . '/../api/addEvent.php';
+
 class OrganisateurController
 {
 

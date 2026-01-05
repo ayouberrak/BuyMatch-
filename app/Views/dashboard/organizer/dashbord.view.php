@@ -103,7 +103,13 @@
 
         <div class="p-6 border-t border-white/5 bg-black/20">
             <div class="flex items-center gap-3">
-                <img id="side-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Organizer1" class="w-9 h-9 rounded-full border border-gray-700">
+                <?php 
+                    // Assure-toi que $organisateur est bien défini dans ton code PHP avant le HTML
+                    // Exemple: $photoPath = '../../public/uploads/' . $organisateur->getPhoto();
+                    // Ici, j'utilise une variable placeholder pour l'exemple
+                    $photoPath = isset($organisateur) ? '../../public/uploads/' . $organisateur->getPhoto() : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Organizer1';
+                ?>
+                <img id="side-avatar" src="<?php echo htmlspecialchars($photoPath); ?>" class="w-9 h-9 rounded-full border border-gray-700 object-cover">
                 <div class="flex-1"><p class="text-xs font-bold text-white">Atlas Events</p></div>
                 <a href="logout.php" class="text-gray-500 hover:text-red-500 transition-colors"><i class='bx bx-log-out text-xl'></i></a>
             </div>
@@ -130,14 +136,12 @@
         <div id="profil" class="section-content fade-in">
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-1">
-                    <?php $path_image = '../../public/uploads/' . $organisateur->getPhoto();
-                      ?>
                     <div class="glass-card rounded-[32px] p-8 text-center relative overflow-hidden">
                         <div class="relative inline-block group mb-6">
-                            <img id="profile-preview" src="<?php echo htmlspecialchars($path_image); ?>" class="relative w-32 h-32 rounded-full border-4 border-[#151515] bg-[#151515] object-cover">
+                            <img id="profile-preview-db" src="<?php echo htmlspecialchars($photoPath); ?>" class="relative w-32 h-32 rounded-full border-4 border-[#151515] bg-[#151515] object-cover">
                             <label class="absolute bottom-1 right-1 bg-[#d4af37] text-black w-9 h-9 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition">
                                 <i class='bx bx-camera text-lg'></i>
-                                <input type="file" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                <input type="file" id="profile-upload" class="hidden" accept="image/*" onchange="previewProfileImage(event)">
                             </label>
                         </div>
                         <h3 class="text-xl font-bold">Atlas Events Pro</h3>
@@ -151,12 +155,12 @@
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div class="input-group relative">
                                     <label class="text-[9px] font-bold uppercase text-gray-500 mb-2 block">Nom Complet</label>
-                                    <input type="text" id="name" value="<?php echo htmlspecialchars($organisateur->getName()) ?>" class="input-dark w-full p-4 rounded-xl text-sm font-bold">
+                                    <input type="text" id="name" value="<?php echo isset($organisateur) ? htmlspecialchars($organisateur->getName()) : 'Nom par défaut'; ?>" class="input-dark w-full p-4 rounded-xl text-sm font-bold">
                                     <i class='bx bx-buildings input-icon'></i>
                                 </div>
                                 <div class="input-group relative">
                                     <label class="text-[9px] font-bold uppercase text-gray-500 mb-2 block">Email Pro</label>
-                                    <input type="email" id="email" value="<?php echo htmlspecialchars($organisateur->getEmail()) ?>" class="input-dark w-full p-4 rounded-xl text-sm font-bold">
+                                    <input type="email" id="email" value="<?php echo isset($organisateur) ? htmlspecialchars($organisateur->getEmail()) : 'email@defaut.com'; ?>" class="input-dark w-full p-4 rounded-xl text-sm font-bold">
                                     <i class='bx bx-envelope input-icon'></i>
                                 </div>
                                 <div class="input-group relative md:col-span-2">
@@ -183,35 +187,269 @@
         </div>
 
         <div id="organiser" class="section-content hidden fade-in">
-            <div class="glass-card rounded-[32px] p-8 max-w-4xl">
-                <form class="space-y-8">
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-[#d4af37] tracking-widest">Équipes</label>
-                            <input type="text" placeholder="Équipe Domicile" class="input-dark w-full p-4 rounded-xl text-sm">
-                            <input type="text" placeholder="Équipe Extérieur" class="input-dark w-full p-4 rounded-xl text-sm">
+            <div class="grid xl:grid-cols-2 gap-8">
+                
+                <div class="glass-card rounded-[32px] p-8">
+                    <h3 class="text-xl font-black italic uppercase mb-6 flex items-center gap-2">
+                        <i class='bx bx-edit text-[#d4af37]'></i> Configuration du Match
+                    </h3>
+                    
+                    <form class="space-y-6" onsubmit="handleAddEvent(event)" enctype="multipart/form-data">
+                        <div class="grid md:grid-cols-2 gap-5">
+                            <div class="relative input-group">
+                                <label class="text-[9px] font-black uppercase text-[#d4af37] tracking-widest mb-2 block">Titre de l'événement</label>
+                                <input type="text" id="input-titre" name="titre" placeholder="ex: Derby Casablanca" class="input-dark w-full p-3 rounded-xl text-sm font-bold" oninput="updatePreviewText('input-titre', 'preview-titre', 'TITRE DU MATCH')">
+                                <i class='bx bx-tag input-icon'></i>
+                            </div>
+                            <div class="relative input-group">
+                                <label class="text-[9px] font-black uppercase text-[#d4af37] tracking-widest mb-2 block">Date & Heure</label>
+                                <input type="datetime-local" id="input-date" name="date_event" class="input-dark w-full p-3 rounded-xl text-sm text-gray-400" oninput="updatePreviewText('input-date', 'preview-date', 'JJ/MM/AAAA --:--')">
+                            </div>
                         </div>
-                        <div class="space-y-4">
-                            <label class="text-[10px] font-black uppercase text-[#d4af37] tracking-widest">Détails</label>
-                            <input type="date" class="input-dark w-full p-4 rounded-xl text-sm">
-                            <input type="text" placeholder="Stade" class="input-dark w-full p-4 rounded-xl text-sm">
+
+                        <div class="border-t border-white/5 my-4"></div>
+
+                        <div class="space-y-3">
+                            <label class="text-[9px] font-black uppercase text-gray-500 tracking-widest block">Équipe Domicile (1)</label>
+                            <div class="flex gap-3">
+                                <div class="relative flex-1 input-group">
+                                    <input type="text" id="input-team1" name="equipe1_nom" placeholder="Nom Équipe 1"  class="input-dark w-full p-3 rounded-xl text-sm font-bold" oninput="updatePreviewText('input-team1', 'preview-team1', 'ÉQUIPE 1')">
+                                    <i class='bx bx-shield input-icon'></i>
+                                </div>
+                                <label class="w-12 h-12 bg-[#151515] border border-white/10 rounded-xl flex items-center justify-center cursor-pointer hover:border-[#d4af37] transition text-gray-400 hover:text-[#d4af37]">
+                                    <i class='bx bx-upload text-xl'></i>
+                                    <input type="file" id="input-logo1" name="equipe1_logo" class="hidden" accept="image/*" onchange="updatePreviewImage('input-logo1', 'preview-logo1')">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="text-[9px] font-black uppercase text-gray-500 tracking-widest block">Équipe Extérieur (2)</label>
+                            <div class="flex gap-3">
+                                <div class="relative flex-1 input-group">
+                                    <input type="text" id="input-team2" name="equipe2_nom" placeholder="Nom Équipe 2" class="input-dark w-full p-3 rounded-xl text-sm font-bold" oninput="updatePreviewText('input-team2', 'preview-team2', 'ÉQUIPE 2')">
+                                    <i class='bx bx-shield-alt-2 input-icon'></i>
+                                </div>
+                                <label class="w-12 h-12 bg-[#151515] border border-white/10 rounded-xl flex items-center justify-center cursor-pointer hover:border-[#d4af37] transition text-gray-400 hover:text-[#d4af37]">
+                                    <i class='bx bx-upload text-xl'></i>
+                                    <input type="file" id="input-logo2" name="equipe2_logo" class="hidden" accept="image/*" onchange="updatePreviewImage('input-logo2', 'preview-logo2')">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/5 my-4"></div>
+
+                        <div class="grid md:grid-cols-2 gap-5">
+                            <div class="relative input-group">
+                                <label class="text-[9px] font-black uppercase text-[#d4af37] tracking-widest mb-2 block">Stade / Lieu</label>
+                                <input type="text" id="input-lieu" placeholder="ex: Stade Med V" name="lieu" class="input-dark w-full p-3 rounded-xl text-sm font-bold" oninput="updatePreviewText('input-lieu', 'preview-lieu', 'Lieu du match')">
+                                <i class='bx bx-map-pin input-icon'></i>
+                            </div>
+                            <div class="relative">
+                                <label class="text-[9px] font-black uppercase text-[#d4af37] tracking-widest mb-2 block">Miniature (Cover)</label>
+                                <label class="flex items-center gap-3 w-full p-3 rounded-xl bg-[#0c0c0c] border border-[#2a2a2a] cursor-pointer hover:border-[#d4af37] transition group">
+                                    <div class="w-8 h-8 bg-[#151515] rounded-lg flex items-center justify-center text-gray-500 group-hover:text-[#d4af37]"><i class='bx bx-image'></i></div>
+                                    <span class="text-xs font-bold text-gray-400">Choisir une image...</span>
+                                    <input type="file" id="input-miniature" name="mignature" class="hidden" accept="image/*" onchange="updatePreviewImage('input-miniature', 'preview-miniature')">
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#d4af37] to-[#f4d03f] text-black font-black uppercase text-[11px] py-4 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] hover:scale-[1.02] transition-all transform mt-4">
+                            Publier le Match
+                        </button>
+                    </form>
+                </div>
+
+                <div class="relative">
+                    <div class="sticky top-10">
+                        <div class="flex items-center justify-between mb-4 px-2">
+                            <span class="text-[10px] font-black uppercase tracking-[3px] text-gray-500 animate-pulse">Live Preview</span>
+                            <div class="flex gap-1">
+                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            </div>
+                        </div>
+
+                        <div class="group relative w-full aspect-[4/5] md:aspect-[16/9] xl:aspect-[3/4] rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-[#050505]">
+                            
+                            <img id="preview-miniature" src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2693&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                            
+                            <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                                
+                                <div class="flex justify-between items-start">
+                                    <div class="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full flex items-center gap-2">
+                                        <i class='bx bx-calendar text-[#d4af37]'></i>
+                                        <span id="preview-date" class="text-[10px] font-black uppercase text-white tracking-wider">JJ/MM/AAAA --:--</span>
+                                    </div>
+                                    <div class="bg-[#d4af37] text-black text-[10px] font-black uppercase px-3 py-1 rounded-md">
+                                        Prochainement
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col items-center gap-4">
+                                    <div class="flex items-center justify-center gap-6 w-full">
+                                        <div class="flex flex-col items-center gap-2 flex-1">
+                                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm p-3 flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                                                <img id="preview-logo1" src="https://cdn-icons-png.flaticon.com/512/10542/10542549.png" class="w-full h-full object-contain drop-shadow-lg">
+                                            </div>
+                                            <span id="preview-team1" class="text-xs md:text-sm font-black uppercase text-center leading-tight drop-shadow-md">Équipe 1</span>
+                                        </div>
+
+                                        <div class="relative">
+                                            <div class="absolute -inset-2 bg-[#d4af37] rounded-full blur opacity-20 animate-pulse"></div>
+                                            <span class="relative z-10 text-2xl md:text-4xl font-black italic text-[#d4af37] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">VS</span>
+                                        </div>
+
+                                        <div class="flex flex-col items-center gap-2 flex-1">
+                                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm p-3 flex items-center justify-center shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                                                <img id="preview-logo2" src="https://cdn-icons-png.flaticon.com/512/10542/10542549.png" class="w-full h-full object-contain drop-shadow-lg">
+                                            </div>
+                                            <span id="preview-team2" class="text-xs md:text-sm font-black uppercase text-center leading-tight drop-shadow-md">Équipe 2</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <h2 id="preview-titre" class="text-2xl md:text-3xl font-black uppercase italic text-white leading-none drop-shadow-lg truncate">TITRE DU MATCH</h2>
+                                    <div class="flex items-center gap-2 text-gray-300">
+                                        <i class='bx bx-map-pin text-[#d4af37]'></i>
+                                        <span id="preview-lieu" class="text-xs font-bold uppercase tracking-wider">Lieu du match</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 rounded-xl border border-white/5 bg-white/5 backdrop-blur-sm flex items-center gap-3">
+                            <i class='bx bx-info-circle text-2xl text-[#d4af37]'></i>
+                            <p class="text-[10px] text-gray-400 leading-relaxed">
+                                C'est un aperçu en temps réel. Assurez-vous que les images sont de haute qualité (PNG transparent pour les logos) pour un rendu optimal sur l'application utilisateur.
+                            </p>
                         </div>
                     </div>
-                    <button type="button" onclick="showStatus('Match soumis pour révision !')" class="w-full bg-white text-black font-black uppercase py-5 rounded-2xl hover:bg-[#d4af37] transition-all">Soumettre</button>
-                </form>
+                </div>
             </div>
         </div>
 
-        <div id="historique" class="section-content hidden fade-in">
+<div id="historique" class="section-content hidden fade-in">
             <div class="glass-card rounded-[32px] overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-black/40 text-[9px] uppercase text-gray-500 tracking-widest border-b border-white/5">
-                        <tr><th class="p-6">Match</th><th class="p-6">Date</th><th class="p-6">Statut</th></tr>
-                    </thead>
-                    <tbody class="text-xs font-bold divide-y divide-white/5">
-                        <tr class="hover:bg-white/5"><td class="p-6">WAC VS RAJA</td><td class="p-6">15/01/2026</td><td class="p-6 text-green-400 uppercase">Confirmé</td></tr>
-                    </tbody>
-                </table>
+                <div class="p-8 border-b border-white/5 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white">Historique des Matchs</h3>
+                    <div class="flex gap-2">
+                        <button class="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#d4af37] hover:text-black flex items-center justify-center transition"><i class='bx bx-filter'></i></button>
+                        <button class="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#d4af37] hover:text-black flex items-center justify-center transition"><i class='bx bx-download'></i></button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-black/40 text-[9px] uppercase text-gray-500 tracking-widest border-b border-white/5">
+                            <tr>
+                                <th class="p-6">Événement</th>
+                                <th class="p-6">Lieu & Date</th>
+                                <th class="p-6">Tickets</th>
+                                <th class="p-6">Statut</th>
+                                <th class="p-6 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs font-bold divide-y divide-white/5">
+                            
+                            <tr class="group hover:bg-white/[0.02] transition-colors">
+                                <td class="p-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex flex-col items-center gap-1 w-12">
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Wydad_Athletic_Club_logo.png/180px-Wydad_Athletic_Club_logo.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="WAC">
+                                            <span class="text-[9px] text-gray-400">WAC</span>
+                                        </div>
+                                        
+                                        <div class="text-[#d4af37] font-black italic text-lg">VS</div>
+                                        
+                                        <div class="flex flex-col items-center gap-1 w-12">
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Raja_Club_Athletic_Logo.svg/1200px-Raja_Club_Athletic_Logo.svg.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="RCA">
+                                            <span class="text-[9px] text-gray-400">RCA</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-6">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-white text-sm font-bold">15 Jan 2026</span>
+                                        <span class="text-[10px] text-gray-500 flex items-center gap-1">
+                                            <i class='bx bx-time'></i> 20:00
+                                        </span>
+                                        <span class="text-[10px] text-[#d4af37] flex items-center gap-1 mt-1">
+                                            <i class='bx bx-map'></i> Stade Med V
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="p-6">
+                                    <div class="w-full bg-white/10 rounded-full h-1.5 w-24 mb-1">
+                                        <div class="bg-green-500 h-1.5 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400">85% Vendu</span>
+                                </td>
+                                <td class="p-6">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                        Confirmé
+                                    </span>
+                                </td>
+                                <td class="p-6 text-right">
+                                    <button class="text-gray-400 hover:text-white transition p-2 hover:bg-white/10 rounded-lg"><i class='bx bx-edit-alt text-lg'></i></button>
+                                    <button class="text-gray-400 hover:text-red-500 transition p-2 hover:bg-red-500/10 rounded-lg"><i class='bx bx-trash text-lg'></i></button>
+                                </td>
+                            </tr>
+
+                            <tr class="group hover:bg-white/[0.02] transition-colors">
+                                <td class="p-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex flex-col items-center gap-1 w-12">
+                                            <img src="https://upload.wikimedia.org/wikipedia/fr/c/c6/Logo_RS_Berkane.svg" class="w-8 h-8 object-contain drop-shadow-lg" alt="RSB">
+                                            <span class="text-[9px] text-gray-400">RSB</span>
+                                        </div>
+                                        
+                                        <div class="text-[#d4af37] font-black italic text-lg">VS</div>
+                                        
+                                        <div class="flex flex-col items-center gap-1 w-12">
+                                            <img src="https://upload.wikimedia.org/wikipedia/fr/4/4e/Fath_Union_Sport_de_Rabat.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="FUS">
+                                            <span class="text-[9px] text-gray-400">FUS</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-6">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-white text-sm font-bold">22 Jan 2026</span>
+                                        <span class="text-[10px] text-gray-500 flex items-center gap-1">
+                                            <i class='bx bx-time'></i> 18:00
+                                        </span>
+                                        <span class="text-[10px] text-[#d4af37] flex items-center gap-1 mt-1">
+                                            <i class='bx bx-map'></i> Stade Municipal
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="p-6">
+                                    <div class="w-full bg-white/10 rounded-full h-1.5 w-24 mb-1">
+                                        <div class="bg-[#d4af37] h-1.5 rounded-full" style="width: 10%"></div>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400">10% Vendu</span>
+                                </td>
+                                <td class="p-6">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[10px] uppercase tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                                        En attente
+                                    </span>
+                                </td>
+                                <td class="p-6 text-right">
+                                    <button class="text-gray-400 hover:text-white transition p-2 hover:bg-white/10 rounded-lg"><i class='bx bx-edit-alt text-lg'></i></button>
+                                    <button class="text-gray-400 hover:text-red-500 transition p-2 hover:bg-red-500/10 rounded-lg"><i class='bx bx-trash text-lg'></i></button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -222,12 +460,18 @@
                     <div class="flex-1"><h5 class="text-sm font-bold">Karim T.</h5><p class="text-xs text-gray-400">Accès parfait !</p></div>
                     <button onclick="this.parentElement.remove()" class="text-red-500"><i class='bx bx-trash text-xl'></i></button>
                 </div>
+                <div id="msg-2" class="glass-card p-5 rounded-2xl flex gap-4 items-center">
+                    <img src="https://i.pravatar.cc/100?img=5" class="w-10 h-10 rounded-full">
+                    <div class="flex-1"><h5 class="text-sm font-bold">Ahmed L.</h5><p class="text-xs text-gray-400">Prix chwia ghali...</p></div>
+                    <button onclick="this.parentElement.remove()" class="text-red-500"><i class='bx bx-trash text-xl'></i></button>
+                </div>
             </div>
         </div>
 
     </main>
 
     <script>
+        // --- NAVIGATION ---
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -243,11 +487,12 @@
             document.getElementById('page-title').innerHTML = titles[id];
         }
 
+        // --- ALERTES ---
         function showStatus(msg, isError = false) {
             const alertBox = document.getElementById('status-alert');
             const iconBox = document.getElementById('alert-icon-box');
-            const icon = document.getElementById('alert-icon');
             const message = document.getElementById('alert-message');
+            const icon = document.getElementById('alert-icon');
 
             alertBox.style.display = 'flex';
             message.textContent = msg;
@@ -263,25 +508,63 @@
             }
         }
 
+        // --- LIVE PREVIEW (MATCH) ---
+        function updatePreviewText(inputId, previewId, defaultText) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            if(inputId === 'input-date' && input.value) {
+                const d = new Date(input.value);
+                preview.textContent = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+            } else {
+                preview.textContent = input.value || defaultText;
+            }
+        }
+
+        function updatePreviewImage(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- GESTION PROFIL (UPDATE + PHOTO) ---
         function handleUpdate(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.textContent = 'CHARGEMENT...';
             btn.disabled = true;
 
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('password', document.getElementById('password').value);
+            
+            const imageInput = document.getElementById('profile-upload');
+            if (imageInput.files[0]) {
+                formData.append('photo', imageInput.files[0]);
+            }
 
             fetch('../api/updateProfile.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                body: formData 
             })
             .then(res => res.json())
             .then(data => {
-                if(data.status === 'success') showStatus('Profil mis à jour !', false);
-                else showStatus(data.message, true);
+                if(data.status === 'success') {
+                    showStatus('Profil mis à jour !', false);
+                    if(data.new_photo) {
+                         document.getElementById('profile-preview-db').src = data.new_photo;
+                         document.getElementById('side-avatar').src = data.new_photo;
+                    }
+                } else {
+                    showStatus(data.message || 'Erreur inconnue', true);
+                }
             })
             .catch(() => showStatus('Serveur injoignable.', true))
             .finally(() => {
@@ -290,10 +573,18 @@
             });
         }
 
+        function previewProfileImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                document.getElementById('profile-preview-db').src = reader.result;
+                document.getElementById('side-avatar').src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
         function confirmDelete() {
             if(confirm('Êtes-vous sûr de vouloir désactiver votre compte ? Cette action est irréversible.')) {
-                fetch('../api/deleteAccount.php',
-                 { method: 'DELETE' })
+                fetch('../api/deleteAccount.php', { method: 'DELETE' })
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === 'success') {
@@ -307,13 +598,56 @@
             }
         }
 
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function(){
-                document.getElementById('profile-preview').src = reader.result;
-                document.getElementById('side-avatar').src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
+        function handleAddEvent(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.textContent = 'PUBLICATION...';
+            btn.disabled = true;
+            const formData = new FormData();
+            formData.append('titre', document.getElementById('input-titre').value);
+            formData.append('date_event', document.getElementById('input-date').value);
+            formData.append('equipe1_nom', document.getElementById('input-team1').value);
+            formData.append('equipe2_nom', document.getElementById('input-team2').value);
+            formData.append('lieu', document.getElementById('input-lieu').value);
+            const logo1 = document.getElementById('input-logo1');
+            const logo2 = document.getElementById('input-logo2');
+            const miniature = document.getElementById('input-miniature');
+            if (logo1.files[0]) formData.append('equipe1_logo', logo1.files[0]);
+            if (logo2.files[0]) formData.append('equipe2_logo', logo2.files[0]);
+            if (miniature.files[0]) formData.append('mignature', miniature.files[0]);
+            fetch('/BuyMatch-/app/api/addEvent.php', {
+                method: 'POST',
+                body: formData 
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    showStatus('Match créé avec succès !', false);
+                    e.target.reset();
+                    console.log(data);
+                    console.log('date suses ');
+
+                    document.getElementById('preview-titre').textContent = 'TITRE DU MATCH';
+                    document.getElementById('preview-date').textContent = 'JJ/MM/AAAA --:--';
+                    document.getElementById('preview-team1').textContent = 'ÉQUIPE 1';
+                    document.getElementById('preview-team2').textContent = 'ÉQUIPE 2';
+                    document.getElementById('preview-lieu').textContent = 'Lieu du match';
+                    document.getElementById('preview-logo1').src = 'https://cdn-icons-png.flaticon.com/512/10542/10542549.png';
+                    document.getElementById('preview-logo2').src = 'https://cdn-icons-png.flaticon.com/512/10542/10542549.png';
+                    document.getElementById('preview-miniature').src = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=2693&auto=format&fit=crop'; 
+
+                } else {
+                    showStatus(data.message, true);
+                }
+            })
+            .catch((err) => {
+                console.error('FETCH ERROR:', err);
+                showStatus('Serveur injoignable.', true);
+            })
+            .finally(() => {
+                btn.textContent = 'Publier le Match';
+                btn.disabled = false;
+            });
         }
     </script>
 </body>

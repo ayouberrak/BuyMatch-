@@ -83,6 +83,13 @@
                 <span class="text-[9px] uppercase tracking-[3px] text-gray-500 font-bold">Organizer Panel</span>
             </div>
         </div>
+                <div class="px-6 mb-6">
+        <a href="homePageControllers.php" class="group flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white/5 border border-white/5 text-gray-300 font-bold uppercase text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300">
+                <i class='bx bx-left-arrow-alt text-lg group-hover:-translate-x-1 transition-transform'></i>
+                Site Public
+            </a>
+        </div>
+
 
         <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
             <p class="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2">Compte</p>

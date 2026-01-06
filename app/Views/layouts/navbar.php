@@ -38,138 +38,59 @@
 </head>
 <body class="pt-32">
 
-    <!-- NAVBAR -->
-    <nav id="navbar-component" class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl z-[999] nav-glass rounded-full px-6 py-3 md:px-8 md:py-4 flex justify-between items-center transition-all duration-500">
+<?php
+$isLoggedIn = isset($_SESSION['user_id']);
+$role = $isLoggedIn ? $_SESSION['role'] : null;
+?>
+
+<nav class="fixed top-0 w-full bg-black/60 backdrop-blur-xl border-b border-white/5 z-[100]">
+    <div class="max-w-7xl mx-auto px-6 lg:px-20 py-5 flex items-center justify-between">
         
-        <!-- LOGO -->
-        <a href="/" class="flex items-center gap-2 group shrink-0">
-            <i class='bx bxs-zap text-[#d4af37] text-2xl group-hover:animate-pulse'></i>
-            <span class="text-xl font-black italic tracking-tighter uppercase text-white">
-                BUY<span class="gold-text">MATCH</span>
-            </span>
+        <a href="/" class="text-2xl font-black tracking-tighter flex items-center gap-2 group">
+            <div class="w-8 h-8 bg-gold rounded-lg flex items-center justify-center text-black group-hover:rotate-12 transition-transform">B</div>
+            BUY<span class="gold-shine uppercase italic">MATCH</span>
         </a>
 
-        <!-- LINKS (Middle) -->
-        <ul id="nav-links-container" class="hidden lg:flex items-center gap-6 text-[10px] font-extrabold uppercase tracking-[2px] text-gray-300">
-            <!-- Injecté par JS -->
-        </ul>
-
-        <!-- ACTIONS (Right) -->
-        <div id="nav-actions-container" class="flex items-center gap-4 shrink-0">
-            <!-- Injecté par JS -->
+        <div class="hidden md:flex items-center gap-10">
+            <a href="#matches" class="text-[10px] font-black tracking-[3px] uppercase hover:text-gold transition-colors">Matches</a>
+            <a href="#about" class="text-[10px] font-black tracking-[3px] uppercase hover:text-gold transition-colors">About</a>
+            
+            <?php if ($isLoggedIn): ?>
+                <?php if ($role === 'admin'): ?>
+                    <a href="AdminControllers.php" class="text-[10px] font-black tracking-[3px] uppercase text-gold border-b border-gold pb-1 italic">
+                        <i class='bx bxs-dashboard'></i> Espace Admin
+                    </a>
+                <?php elseif ($role === 'organisateur'): ?>
+                    <a href="OrganisateurController.php" class="text-[10px] font-black tracking-[3px] uppercase text-gold border-b border-gold pb-1 italic">
+                        <i class='bx bxs-megaphone'></i> Espace Organisateur
+                    </a>
+                <?php elseif ($role === 'acheteur'): ?>
+                    <a href="UserController.php" class="text-[10px] font-black tracking-[3px] uppercase text-gold border-b border-gold pb-1 italic">
+                        <i class='bx bxs-user-circle'></i> Mon Espace
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
 
-    </nav>
+        <div class="flex items-center gap-4">
+            <?php if (!$isLoggedIn): ?>
+                <a href="LoginController.php" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-white transition">Connexion</a>
+                <a href="SignupController.php" class="px-6 py-2.5 bg-gold text-black font-black rounded-full text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                    Inscription
+                </a>
+            <?php else: ?>
+                <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <span class="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Connecté en tant que <br> <b class="text-white"><?= ucfirst($role) ?></b></span>
+                    <a href="?action=logout" class="w-10 h-10 rounded-full border border-red-500/30 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all" title="Déconnexion">
+                        <i class='bx bx-log-out-circle text-xl'></i>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</nav>
 
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-    <!-- JS LOGIC -->
-    <script>
-        const NavbarManager = {
-            roles: {
-                // 1. GUEST (Non connecté)
-                guest: {
-                    links: [
-                        { label: "Accueil", href: "#home", icon: "bx-home-alt-2" },
-                        { label: "Matchs", href: "#matches", icon: "bx-football" },
-                        { label: "Support", href: "#support", icon: "bx-headphone" }
-                    ],
-                    htmlRight: `
-                        <a href="/signup" class="hidden sm:block text-white hover:text-[#d4af37] text-[10px] font-bold uppercase tracking-widest transition-colors mr-2">
-                            Inscription
-                        </a>
-                        <a href="/login" class="bg-white text-black px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest  hover:text-black transition-all shadow-lg">
-                            Connexion
-                        </a>
-                    `
-                },
-
-                // 2. USER (Connecté)
-                user: {
-                    links: [
-                        { label: "Accueil", href: "#home", icon: "bx-home-alt-2" },
-                        { label: "Matchs", href: "#matches", icon: "bx-football" },
-                        { label: "Mes Réservations", href: "#my-tickets", icon: "bx-ticket" }
-                    ],
-                    htmlRight: `
-                        <div class="flex items-center gap-3 pl-4 border-l border-white/10">
-                            <a href="#profile" class="flex items-center gap-2 bg-white/5 pr-4 pl-1 py-1 rounded-full border border-white/10 hover:border-[#d4af37] transition-all group">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Yassine" class="w-8 h-8 rounded-full border border-[#d4af37]" alt="Avatar">
-                                <span class="text-[10px] font-bold uppercase tracking-widest group-hover:text-[#d4af37]">Profil</span>
-                            </a>
-                            <button onclick="NavbarManager.logout()" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition-all">
-                                <i class='bx bx-log-out text-xl'></i>
-                            </button>
-                        </div>
-                    `
-                },
-
-                // 3. ORGANISATEUR (A maintenant Accueil + Matchs)
-                organisateur: {
-                    links: [
-                        { label: "Accueil", href: "#home", icon: "bx-home-alt-2" },
-                        { label: "Matchs", href: "#matches", icon: "bx-football" },
-                        { label: "Tableau de bord", href: "#dashboard-org", icon: "bx-grid-alt" }, // Spécifique
-                        { label: "Événements", href: "#events", icon: "bx-calendar-event" }     // Spécifique
-                    ],
-                    htmlRight: `
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/30 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                                Organisateur
-                            </span>
-                            <button onclick="NavbarManager.logout()" class="text-gray-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest flex items-center gap-1">
-                                <i class='bx bx-log-out'></i>
-                            </button>
-                        </div>
-                    `
-                },
-
-                // 4. ADMIN (A maintenant Accueil + Matchs)
-                admin: {
-                    links: [
-                        { label: "Accueil", href: "#home", icon: "bx-home-alt-2" },
-                        { label: "Matchs", href: "#matches", icon: "bx-football" },
-                        { label: "Admin Panel", href: "#admin-panel", icon: "bx-shield-quarter" }, // Spécifique
-                        { label: "Utilisateurs", href: "#users", icon: "bx-group" }                // Spécifique
-                    ],
-                    htmlRight: `
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1.5 bg-red-500/10 text-red-500 border border-red-500/30 rounded-lg text-[9px] font-black uppercase tracking-widest animate-pulse">
-                                ● Admin
-                            </span>
-                            <button onclick="NavbarManager.logout()" class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-all shadow-lg shadow-red-900/50">
-                                <i class='bx bx-power-off'></i>
-                            </button>
-                        </div>
-                    `
-                }
-            },
-
-            init: function(userRole) {
-                const config = this.roles[userRole] || this.roles.guest;
-                
-                // Remplir Liens
-                document.getElementById('nav-links-container').innerHTML = config.links.map(link => `
-                    <li>
-                        <a href="${link.href}" class="nav-link flex items-center gap-1.5 hover:text-white">
-                            <i class='bx ${link.icon} text-sm mb-0.5'></i> ${link.label}
-                        </a>
-                    </li>
-                `).join('');
-
-                // Remplir Actions
-                document.getElementById('nav-actions-container').innerHTML = config.htmlRight;
-            },
-
-            logout: function() {
-                console.log("Logout...");
-                this.init('guest'); // Pour tester
-            }
-        };
-
-        // --- TEST ZONE ---
-        // Change ici pour tester : 'guest', 'user', 'organisateur', 'admin'
-        NavbarManager.init('organisateur'); 
-
-    </script>
 </body>
 </html>

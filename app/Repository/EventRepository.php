@@ -42,6 +42,29 @@ class EvnetRepository{
 
     }
 
+    public function findById(int $id): ?Event
+    {
+        $stmt = $this->db->prepare("SELECT * FROM evenements WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return null;
+        }
+
+        return new Event(
+            $data['id'],
+            $data['titre'],
+            $data['mignature'],
+            $data['date_event'],
+            $data['lieu'],
+            $data['statut'],
+            $data['organisateur_id'],
+            $data['note_moyenne'],
+            $data['equipe_a_id'],
+            $data['equipe_b_id']
+        );
+    }
 
 
     public function getEventsByOrganisateurId(int $organisateur): array
@@ -115,5 +138,14 @@ class EvnetRepository{
         }
 
         return $events;
+    }
+
+    public function updateEventStatus(int $eventId, string $newStatus): bool
+    {
+        $stmt = $this->db->prepare("UPDATE evenements SET statut = :statut WHERE id = :id");
+        return $stmt->execute([
+            ':statut' => $newStatus,
+            ':id' => $eventId
+        ]);
     }
 }

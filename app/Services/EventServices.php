@@ -23,4 +23,14 @@ class EventServices {
         $event->setOrganisateurId($organisateur->getId()); 
         return $this->eventRepository->create($event, $equipe1, $equipe2);
     }
+
+    public function getEventsByOrganisateur(int $organisateurId): array
+    {
+        return $this->eventRepository->getEventsByOrganisateurId($organisateurId);
+    }
+
+
+    public function getEventStatusEnatente(){
+        return $this->eventRepository->getEventStatusEnatente();
+    }
 }

@@ -33,4 +33,9 @@ class EventServices {
     public function getEventStatusEnatente(){
         return $this->eventRepository->getEventStatusEnatente();
     }
+
+    public function updateEventStatus(int $eventId, string $newStatus): bool
+    {
+        return $this->eventRepository->updateEventStatus($eventId, $newStatus);
+    }
 }

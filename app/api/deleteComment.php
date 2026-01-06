@@ -17,13 +17,19 @@ class DeleteComment {
         $this->commentsService = new CommentsService();
     }
 
-    public function deleteComment(int $commentId): bool
+    public function deleteComment(int $id): bool
     {
-        return $this->commentsService->deleteComment($commentId);
+        return $this->commentsService->deleteComment($id);
     }
     
 }
 
 $deleteComment = new DeleteComment();
-$deleteComment->deleteComment($input['commentId']);
-// echo json_encode(['status' => 'success']);
+
+$id = (int) $input['commentId'];
+$deleted = $deleteComment->deleteComment($id);
+if ($deleted) {
+    echo json_encode(['status' => 'success']);
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Suppression échouée']);
+}

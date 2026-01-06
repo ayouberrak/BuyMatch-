@@ -89,7 +89,7 @@
 
         <!-- Retour Accueil -->
         <div class="px-6 mb-6">
-            <a href="/" class="group flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white/5 border border-white/5 text-gray-300 font-bold uppercase text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300">
+            <a href="homePageControllers.php" class="group flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white/5 border border-white/5 text-gray-300 font-bold uppercase text-[10px] tracking-widest hover:bg-[#d4af37] hover:text-black hover:border-[#d4af37] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300">
                 <i class='bx bx-left-arrow-alt text-lg group-hover:-translate-x-1 transition-transform'></i>
                 Site Public
             </a>
@@ -119,10 +119,10 @@
                     <i class='bx bx-crown text-xl'></i>
                 </div>
                 <div class="flex-1">
-                    <p class="text-xs font-bold text-white">Super Admin</p>
+                    <p class="text-xs font-bold text-white">Admin Panel</p>
                     <p class="text-[9px] text-gray-500">Accès Total</p>
                 </div>
-                <button class="text-gray-500 hover:text-white"><i class='bx bx-log-out text-xl'></i></button>
+                <a href="?action=logout"><button class="text-gray-500 hover:text-white"><i class='bx bx-log-out text-xl'></i></button></a>
             </div>
         </div>
     </aside>
@@ -470,16 +470,20 @@
 
         }
 
-        // Moderate Comment
         function deleteComment(id) {
             const el = document.getElementById(id);
             el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
 
+            const commentId = parseInt(id.split('-')[1], 10);
             fetch('../api/deleteComment.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commentId: id.split('-')[1] })
+                body: JSON.stringify({ commentId: commentId })
+            })
+            .then(response => response.json())
+            .then(data => { 
+                console.log('Response:', data);
             })
             .catch((error) => console.error('Error:', error));
         }

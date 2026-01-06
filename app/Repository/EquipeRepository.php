@@ -20,4 +20,21 @@ class EquipeRepository {
 
         return (int)$this->db->lastInsertId();
     }
+
+    public function findById(int $id): ?Equipe
+    {
+        $stmt = $this->db->prepare("SELECT * FROM equipes WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return null;
+        }
+
+        return new Equipe(
+            $data['id'],
+            $data['nom'],
+            $data['logo']
+        );
+    }
 }

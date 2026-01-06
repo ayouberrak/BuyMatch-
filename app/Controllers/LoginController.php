@@ -42,7 +42,7 @@ class LoginController
                     header('Location: OrganisateurController.php');
                     break;
                 default:
-                    header('Location: /acheteur');
+                    header('Location: homePageControllers.php');
             }
             exit();
 

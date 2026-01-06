@@ -105,7 +105,7 @@
             </button>
             <button onclick="showSection('validations')" class="sidebar-link w-full flex items-center gap-4 px-4 py-3.5 text-sm font-bold text-gray-400 rounded-r-xl">
                 <i class='bx bxs-check-shield'></i> Validations Matchs
-                <span class="ml-auto bg-[#d4af37] text-black text-[10px] px-2 py-0.5 rounded-full font-bold">3</span>
+                <span class="ml-auto bg-[#d4af37] text-black text-[10px] px-2 py-0.5 rounded-full font-bold"><?= count($eventsEnatente) ?></span>
             </button>
             <button onclick="showSection('comments')" class="sidebar-link w-full flex items-center gap-4 px-4 py-3.5 text-sm font-bold text-gray-400 rounded-r-xl">
                 <i class='bx bxs-message-rounded-error'></i> Modération
@@ -229,47 +229,23 @@
                     </thead>
                     <tbody class="text-sm">
                         <!-- User 1 -->
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition">
-                            <td class="p-5 flex items-center gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=User1" class="w-8 h-8 rounded-full">
-                                <span class="font-bold">Youssef Bennani</span>
-                            </td>
-                            <td class="p-5 text-gray-400">Utilisateur</td>
-                            <td class="p-5"><span id="status-1" class="status-badge status-active">Actif</span></td>
-                            <td class="p-5 text-right">
-                                <button onclick="toggleBan(1)" class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition">
-                                    <i class='bx bx-block'></i> Bannir
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- User 2 (Organizer) -->
-                        <tr class="border-b border-white/5 hover:bg-white/5 transition">
-                            <td class="p-5 flex items-center gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Org1" class="w-8 h-8 rounded-full border border-[#d4af37]">
-                                <span class="font-bold">Atlas Events</span>
-                            </td>
-                            <td class="p-5 text-[#d4af37]">Organisateur</td>
-                            <td class="p-5"><span id="status-2" class="status-badge status-active">Actif</span></td>
-                            <td class="p-5 text-right">
-                                <button onclick="toggleBan(2)" class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition">
-                                    <i class='bx bx-block'></i> Bannir
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- User 3 (Banned) -->
-                        <tr class="hover:bg-white/5 transition">
-                            <td class="p-5 flex items-center gap-3">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Spam" class="w-8 h-8 rounded-full grayscale opacity-50">
-                                <span class="font-bold text-gray-500">Bot Spam</span>
-                            </td>
-                            <td class="p-5 text-gray-500">Utilisateur</td>
-                            <td class="p-5"><span id="status-3" class="status-badge status-banned">Banni</span></td>
-                            <td class="p-5 text-right">
-                                <button onclick="toggleBan(3)" class="text-xs font-bold uppercase tracking-wider text-green-500 hover:text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg hover:bg-green-500/10 transition">
-                                    <i class='bx bx-check-circle'></i> Activer
-                                </button>
-                            </td>
-                        </tr>
+                        <?php foreach ($allUsers as $user):
+                            $path_image = '../../public/uploads/'. $user->getPhoto();
+                            ?>
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                                <td class="p-5 flex items-center gap-3">
+                                    <img src="<?= htmlspecialchars($path_image) ?>" class="w-8 h-8 rounded-full">
+                                    <span class="font-bold"><?= htmlspecialchars($user->getName()) ?></span>
+                                </td>
+                                <td class="p-5 text-gray-400"><?= htmlspecialchars($user->getRole()) ?></td>
+                                <td class="p-5"><span id="status-<?= htmlspecialchars($user->getId()) ?>" class="status-badge status-active"><?= htmlspecialchars($user->getStatus()) ?></span></td>
+                                <td class="p-5 text-right">
+                                    <button onclick="toggleBan(<?= htmlspecialchars($user->getId()) ?>)" class="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition">
+                                        <i class='bx bx-block'></i> Bannir
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -277,60 +253,77 @@
 
         <!-- SECTION C: VALIDATION MATCHS (Accept/Reject) -->
         <div id="validations" class="section-content hidden fade-in">
-            <h3 class="font-bold text-lg mb-6">Demandes en attente (3)</h3>
+            <h3 class="font-bold text-lg mb-6">Demandes en attente (<?= count($eventsEnatente) ?>)</h3>
             
             <div class="grid gap-6">
                 <!-- Request Item 1 -->
-                <div id="request-1" class="glass-card p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-l-[#d4af37]">
-                    <div class="flex items-center gap-6 w-full">
-                        <div class="text-center min-w-[80px]">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Janvier</p>
-                            <p class="text-2xl font-black text-white">28</p>
+                <?php foreach ($eventsEnatente as $event):
+                    $path_logo1 = '../../public/uploads_logo_equipe/'. $event['equipe1']->getLogo();
+                    $path_logo2 = '../../public/uploads_logo_equipe/'. $event['equipe2']->getLogo();
+                    $dateEvent = new DateTime($event['event']->getDateEvent());
+                    $heureEvent = new DateTime($event['event']->getDateEvent());
+                    $dateFormated  = $dateEvent->format('d/m/Y'); // 10/10/1111
+                    $heureFormated = $heureEvent->format('H:i');  // 20:20
+
+                     ?>
+                   <div id="<?= $event['event']->getId() ?>" class="group relative overflow-hidden glass-card rounded-[32px] flex flex-col xl:flex-row items-stretch border-none transition-all duration-500 hover:scale-[1.01] hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+    
+                <div class="relative min-w-[300px] bg-gradient-to-br from-[#1a1a1a] to-[#050505] p-8 flex flex-col justify-center items-center border-r border-dashed border-white/10">
+                    <div class="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center font-black italic text-8xl uppercase tracking-tighter text-white">VS</div>
+                    
+                    <div class="relative z-10 flex items-center gap-6">
+                        <div class="text-center">
+                            <img src="<?php echo $path_logo1; ?>" class="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" alt="WAC">
+                            <p class="text-[10px] font-black text-gray-500 mt-2 uppercase"><?php echo $event['equipe1']->getNom(); ?></p>
                         </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <span class="bg-purple-500/20 text-purple-400 text-[9px] font-black uppercase px-2 py-0.5 rounded">Botola Pro</span>
-                                <span class="text-gray-500 text-xs flex items-center gap-1"><i class='bx bxs-user'></i> Org: Atlas Events</span>
-                            </div>
-                            <h4 class="text-xl font-black uppercase italic">WAC <span class="text-[#d4af37]">vs</span> RAJA</h4>
-                            <p class="text-sm text-gray-400">Stade Mohammed V • 20:00 GMT+1</p>
+                        
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl font-black italic text-[#d4af37]">VS</span>
+                            <span class="bg-[#d4af37]/10 text-[#d4af37] text-[8px] px-2 py-0.5 rounded-full font-bold mt-1 uppercase">CHOC</span>
+                        </div>
+
+                        <div class="text-center">
+                            <img src="<?php echo $path_logo2; ?>" class="w-16 h-16 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" alt="RCA">
+                            <p class="text-[10px] font-black text-gray-500 mt-2 uppercase"><?php echo $event['equipe2']->getNom(); ?></p>
                         </div>
                     </div>
-                    <div class="flex gap-3 w-full md:w-auto">
-                        <button onclick="handleRequest('request-1', 'rejected')" class="flex-1 md:flex-none px-6 py-3 rounded-xl border border-red-500/30 text-red-500 font-bold uppercase text-xs hover:bg-red-500 hover:text-white transition">
-                            Refuser
-                        </button>
-                        <button onclick="handleRequest('request-1', 'accepted')" class="flex-1 md:flex-none px-6 py-3 rounded-xl bg-[#d4af37] text-black font-bold uppercase text-xs hover:bg-white hover:shadow-[0_0_15px_#d4af37] transition">
-                            Valider
-                        </button>
+
+                    <div class="absolute -top-4 -right-4 w-8 h-8 bg-[#050505] rounded-full z-20"></div>
+                    <div class="absolute -bottom-4 -right-4 w-8 h-8 bg-[#050505] rounded-full z-20"></div>
+                </div>
+
+                <div class="flex-1 p-8 flex flex-col justify-center gap-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase px-3 py-1 rounded-lg tracking-widest">Botola Pro Inwi</span>
+                        <span class="flex items-center gap-1 text-[#d4af37] text-[10px] font-bold uppercase"><i class='bx bxs-award'></i> Match Certifié</span>
+                    </div>
+
+                    <div>
+                        <h4 class="text-3xl font-black uppercase italic leading-tight text-white mb-1">
+                            <?php echo $event['event']->getTitre(); ?> 
+                        </h4>
+                        <div class="flex flex-wrap gap-x-6 gap-y-2">
+                            <p class="text-sm text-gray-400 flex items-center gap-2"><i class='bx bxs-calendar text-[#d4af37]'></i><?php echo $dateFormated; ?></p>
+                            <p class="text-sm text-gray-400 flex items-center gap-2"><i class='bx bxs-time-five text-[#d4af37]'></i> <?php echo $heureFormated; ?></p>
+                            <p class="text-sm text-gray-400 flex items-center gap-2"><i class='bx bxs-map text-[#d4af37]'></i> <?php echo $event['event']->getLieu(); ?></p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Request Item 2 -->
-                <div id="request-2" class="glass-card p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-l-[#d4af37]">
-                    <div class="flex items-center gap-6 w-full">
-                        <div class="text-center min-w-[80px]">
-                            <p class="text-xs font-bold text-gray-500 uppercase">Février</p>
-                            <p class="text-2xl font-black text-white">02</p>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <span class="bg-blue-500/20 text-blue-400 text-[9px] font-black uppercase px-2 py-0.5 rounded">Coupe du Trône</span>
-                                <span class="text-gray-500 text-xs flex items-center gap-1"><i class='bx bxs-user'></i> Org: Karim Event</span>
-                            </div>
-                            <h4 class="text-xl font-black uppercase italic">MAS <span class="text-[#d4af37]">vs</span> FAR</h4>
-                            <p class="text-sm text-gray-400">Grand Stade de Fès • 18:00 GMT+1</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 w-full md:w-auto">
-                        <button onclick="handleRequest('request-2', 'rejected')" class="flex-1 md:flex-none px-6 py-3 rounded-xl border border-red-500/30 text-red-500 font-bold uppercase text-xs hover:bg-red-500 hover:text-white transition">
-                            Refuser
-                        </button>
-                        <button onclick="handleRequest('request-2', 'accepted')" class="flex-1 md:flex-none px-6 py-3 rounded-xl bg-[#d4af37] text-black font-bold uppercase text-xs hover:bg-white hover:shadow-[0_0_15px_#d4af37] transition">
-                            Valider
-                        </button>
-                    </div>
+                <div class="p-8 flex flex-row xl:flex-col justify-center gap-4 bg-white/[0.02] border-l border-white/5 min-w-[220px]">
+                    <button onclick="handleRequest('<?= $event['event']->getId() ?>', 'accepted')" class="flex-1 xl:flex-none order-2 xl:order-1 flex items-center justify-center gap-2 bg-[#d4af37] text-black font-black uppercase text-xs py-4 px-6 rounded-2xl hover:bg-white transition-all shadow-[0_10px_20px_rgba(212,175,55,0.2)] hover:shadow-[0_10px_30px_rgba(255,255,255,0.3)] group/btn">
+                        <i class='bx bx-check-double text-xl'></i>
+                        <span>Valider</span>
+                    </button>
+                    
+                    <button onclick="handleRequest('<?= $event['event']->getId() ?>', 'rejected')" class="flex-1 xl:flex-none order-1 xl:order-2 flex items-center justify-center gap-2 bg-transparent border border-white/10 text-gray-400 font-black uppercase text-xs py-4 px-6 rounded-2xl hover:bg-red-500 hover:text-white hover:border-red-500 transition-all">
+                        <i class='bx bx-x text-xl'></i>
+                        <span>Refuser</span>
+                    </button>
                 </div>
+            </div>
+                <?php endforeach; ?>
+
             </div>
         </div>
 
@@ -339,35 +332,57 @@
             <h3 class="font-bold text-lg mb-6">Modération des Commentaires</h3>
             
             <div class="space-y-4">
-                <div id="comm-1" class="glass-card p-5 rounded-2xl border-l-4 border-red-500">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-red-500 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded">Signalé 5 fois</span>
-                            <span class="text-gray-500 text-xs">Sur le match: WAC vs RAJA</span>
-                        </div>
-                        <span class="text-gray-600 text-[10px]">Il y a 20 min</span>
-                    </div>
-                    <p class="mt-3 text-sm text-gray-200 italic">"Site web nul, arnaque totale, ne pas acheter ici !!! [Lien Spam]"</p>
-                    <div class="mt-4 flex gap-3 justify-end">
-                        <button onclick="deleteComment('comm-1')" class="text-xs text-red-500 font-bold uppercase hover:underline flex items-center gap-1"><i class='bx bx-trash'></i> Supprimer</button>
-                        <button onclick="ignoreComment('comm-1')" class="text-xs text-gray-500 font-bold uppercase hover:text-white flex items-center gap-1"><i class='bx bx-check'></i> Ignorer</button>
-                    </div>
-                </div>
+            
+                <?php foreach ($allComments as $comment): 
+                        $note =$comment['note'];
+                        $datePost = isset($comment['date_commentaire']) ? $comment['date_commentaire'] : date('d/m/Y');
+                    ?>
+                    <div id="comm-<?= $comment['id'] ?>" class="glass-card p-6 rounded-[24px] border-l-4 border-[#d4af37] group hover:bg-white/[0.02] transition-all duration-300">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="bg-[#d4af37] text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-lg shadow-sm">
+                                        <?= htmlspecialchars($comment['user']->getName()) ?>
+                                    </span>
+                                    <span class="text-gray-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <i class='bx bx-football text-[#d4af37]'></i> <?= htmlspecialchars($comment['match']) ?>
+                                    </span>
+                                </div>
+                                
+                                <div class="flex text-[#d4af37] text-xs">
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        <i class='bx <?= $i <= $note ? 'bxs-star' : 'bx-star text-gray-700' ?>'></i>
+                                    <?php endfor; ?>
+                                    <span class="ml-2 text-[10px] text-gray-500 font-bold">(<?= $note ?>/5)</span>
+                                </div>
+                            </div>
 
-                <div id="comm-2" class="glass-card p-5 rounded-2xl border-l-4 border-yellow-500">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-yellow-500 text-black text-[9px] font-bold uppercase px-2 py-0.5 rounded">Signalé 1 fois</span>
-                            <span class="text-gray-500 text-xs">Sur le match: MAS vs FAR</span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-gray-500 text-[10px] font-bold uppercase tracking-tighter">
+                                    <i class='bx bx-calendar-alt'></i> <?= htmlspecialchars($comment['date_commentaire']) ?>
+                                </span>
+                                <span class="text-[9px] text-gray-700 font-bold uppercase">Publié</span>
+                            </div>
                         </div>
-                        <span class="text-gray-600 text-[10px]">Il y a 1h</span>
+
+                        <div class="relative pl-4 border-l border-white/5">
+                            <p class="text-sm text-gray-300 italic leading-relaxed font-medium">
+                                "<?= htmlspecialchars($comment['contenu']) ?>"
+                            </p>
+                        </div>
+
+                        <div class="mt-5 flex gap-4 justify-end border-t border-white/5 pt-4">
+                            <button onclick="ignoreComment('comm-<?= $comment['id'] ?>')" class="text-[10px] text-gray-500 font-black uppercase tracking-widest hover:text-white transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5">
+                                <i class='bx bx-check-circle text-lg text-green-500'></i> Ignorer
+                            </button>
+                            <button onclick="deleteComment('comm-<?= $comment['id'] ?>')" class="text-[10px] text-red-500 font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/20 shadow-lg shadow-red-500/5">
+                                <i class='bx bx-trash text-lg'></i> Supprimer
+                            </button>
+                        </div>
                     </div>
-                    <p class="mt-3 text-sm text-gray-200 italic">"Je revends mes billets VIP moins cher, contactez moi au 06..."</p>
-                    <div class="mt-4 flex gap-3 justify-end">
-                        <button onclick="deleteComment('comm-2')" class="text-xs text-red-500 font-bold uppercase hover:underline flex items-center gap-1"><i class='bx bx-trash'></i> Supprimer</button>
-                        <button onclick="ignoreComment('comm-2')" class="text-xs text-gray-500 font-bold uppercase hover:text-white flex items-center gap-1"><i class='bx bx-check'></i> Ignorer</button>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+
+
             </div>
         </div>
 
@@ -416,10 +431,20 @@
                 btn.classList.replace('border-green-500/30', 'border-red-500/30');
                 btn.classList.replace('hover:bg-green-500/10', 'hover:bg-red-500/10');
             }
+
+
+            fetch('../api/UpdateStatus.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: id })
+            })
+            // .then(response => response.json())
+            // .then(data => { console.log('Success:', data) })
+            .catch((error) => console.error('Error:', error));
         }
 
         // Handle Match Request
-        function handleRequest(id, action) {
+        function  handleRequest(id, action) {
             const card = document.getElementById(id);
             const content = card.innerHTML;
             
@@ -435,6 +460,14 @@
                 card.style.opacity = '0';
                 setTimeout(() => card.remove(), 500);
             }, 2000);
+
+            fetch('../api/handleRequest.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ requestId: id, action: action })
+            })
+            .catch((error) => console.error('Error:', error));
+
         }
 
         // Moderate Comment
@@ -442,6 +475,13 @@
             const el = document.getElementById(id);
             el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
+
+            fetch('../api/deleteComment.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commentId: id.split('-')[1] })
+            })
+            .catch((error) => console.error('Error:', error));
         }
 
         function ignoreComment(id) {

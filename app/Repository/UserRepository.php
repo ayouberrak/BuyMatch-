@@ -87,10 +87,45 @@ class UserRepository{
         ]);
     }
 
-    public function deleteUser(int $id): bool
+
+    public function getAllUsers(): array
     {
-        $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
-        return $stmt->execute([':id' => $id]);
+        $stmt = $this->db->query("SELECT * FROM users");
+        $users = [];
+
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $users[] = new User(
+                $data['id'],
+                $data['nom'],
+                $data['email'],
+                $data['password'],
+                $data['image_profil'],
+                $data['role'],
+                $data['status']
+            );
+        }
+
+        return $users;
+    }
+
+
+    public function Updatestatus(int $id): bool
+    {
+        $stmt = $this->db->prepare("SELECT status FROM users WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return false;
+        }
+
+        $newStatus = ($data['status'] === 'actif') ? 'banner' : 'actif';
+
+        $updateStmt = $this->db->prepare("UPDATE users SET status = :status WHERE id = :id");
+        return $updateStmt->execute([
+            ':status' => $newStatus,
+            ':id' => $id
+        ]);
     }
 
 

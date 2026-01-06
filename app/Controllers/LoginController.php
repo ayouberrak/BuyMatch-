@@ -36,7 +36,7 @@ class LoginController
 
             switch ($user->getRole()) {
                 case 'admin':
-                    header('Location: /admin');
+                    header('Location: AdminControllers.php');
                     break;
                 case 'organisateur':
                     header('Location: OrganisateurController.php');

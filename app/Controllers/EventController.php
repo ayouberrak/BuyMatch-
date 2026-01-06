@@ -8,6 +8,20 @@ require_once __DIR__ . '/../Models/Organisateur.php';
 require_once __DIR__ . '/../Services/EventServices.php';
 
 class EventController {
+
+    private EventServices $eventServices;
+
+    public function __construct()
+    {
+        $this->eventServices = new EventServices();
+    }
+
+    public function getEventsByOrganisateur(int $organisateurId): array
+    {
+        return $this->eventServices->getEventsByOrganisateur($organisateurId);
+    }
+
+    
     
 }
 

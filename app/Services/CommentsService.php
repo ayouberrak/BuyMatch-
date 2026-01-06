@@ -18,5 +18,15 @@ class CommentsService {
     {
         return $this->commentairesRepository->getCommentsByOrganisateurId($organisateurId);
     }
-    
+
+    public function getAllComments(): array
+    {
+        return $this->commentairesRepository->getAllComments();
+    }
+
+    public function deleteComment(int $commentId): bool
+    {
+        return $this->commentairesRepository->deleteCommentById($commentId);
+    }
+
 }

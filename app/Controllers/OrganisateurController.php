@@ -8,6 +8,14 @@ require_once __DIR__ . '/../Models/User.php';
 require_once __DIR__ . '/../Services/AuthService.php';
 require_once __DIR__ . '/../Repository/UserRepository.php';
 require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
+require_once __DIR__ . '/../Models/Event.php';
+require_once __DIR__ . '/../Repository/EventRepository.php';
+require_once __DIR__ . '/../Models/equipe.php';
+require_once __DIR__ . '/../Models/Organisateur.php';
+require_once __DIR__ . '/../Services/EventServices.php';
+require_once __DIR__ . '/../Services/CommentsService.php';
+require_once __DIR__ . '/../Repository/CommentairesRepository.php';
+
 // require_once __DIR__ . '/../api/updateProfile.php';
 
 
@@ -38,7 +46,7 @@ class OrganisateurController
 
     // }
 }
-// AuthMiddleware::checkRole('organisateur');
+AuthMiddleware::checkRole('organisateur');
 $organisateurController = new OrganisateurController();
 $organisateur = $organisateurController->profile();
 
@@ -48,5 +56,59 @@ $organisateur = $organisateurController->profile();
 //     $_POST['password'] ?? ''
 // );
 
+class GetEventsByOrganisateur
+{
+    private EventServices $eventServices;
+
+    public function __construct()
+    {
+        $this->eventServices = new EventServices();
+    }
+
+    public function getEventsByOrganisateur(int $organisateurId): array
+    {
+        return $this->eventServices->getEventsByOrganisateur($organisateurId);
+    }
+}
+
+$getEventsByOrganisateur = new GetEventsByOrganisateur(); 
+$events = $getEventsByOrganisateur->getEventsByOrganisateur($_SESSION['user_id']); 
+
+
+class GetCommentsByOrganisateur
+{
+    private CommentsService $commentsService;
+
+    public function __construct()
+    {
+        $this->commentsService = new CommentsService();
+    }
+
+    public function getCommentsByOrganisateur(int $organisateurId): array
+    {
+        return $this->commentsService->getCommentsByOrganisateur($organisateurId);
+    }
+}
+
+$getCommentsByOrganisateur = new GetCommentsByOrganisateur();
+$comments = $getCommentsByOrganisateur->getCommentsByOrganisateur($_SESSION['user_id']);
+
+
+class LogoutController
+{
+    public function logout()
+    {
+        session_start();
+        session_unset();
+        session_destroy();
+        header("Location: homePageControllers.php");
+        exit();
+    }
+}
+
+$logoutController = new LogoutController();
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    $logoutController->logout();
+}
 
 require_once __DIR__ . '/../Views/dashboard/organizer/dashbord.view.php';

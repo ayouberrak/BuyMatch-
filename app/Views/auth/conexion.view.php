@@ -58,7 +58,7 @@
     <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/90 to-transparent z-[-1]"></div>
 
     <div class="fixed top-8 left-8 z-50 animate-enter">
-        <a href="index.php" class="group flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#d4af37]/50 transition-all">
+        <a href="homePageControllers.php" class="group flex items-center gap-3 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#d4af37]/50 transition-all">
             <i class='bx bx-left-arrow-alt text-xl text-gray-400 group-hover:text-[#d4af37] transition-colors'></i>
             <span class="text-[10px] font-black uppercase tracking-[2px] text-gray-400 group-hover:text-white transition-colors">Menu Principal</span>
         </a>

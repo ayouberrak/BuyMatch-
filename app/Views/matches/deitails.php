@@ -61,7 +61,7 @@
             width: 32px; height: 32px;
             border-radius: 8px;
             background: rgba(255,255,255,0.05);
-            display: flex; items-center; justify-center;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
         .qty-btn:hover { background: #d4af37; color: black; }

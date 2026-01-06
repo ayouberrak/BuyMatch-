@@ -97,21 +97,18 @@
             </button>
             <p class="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-2 mt-6">Social</p>
             <button onclick="showSection('commentaires')" class="nav-btn sidebar-link w-full flex items-center gap-4 px-4 py-3.5 text-sm font-bold text-gray-400 rounded-xl">
-                <i class='bx bx-message-square-dots text-xl'></i> Modération <span class="ml-auto bg-red-500/20 text-red-500 text-[9px] px-2 py-0.5 rounded-full">3</span>
+                <i class='bx bx-message-square-dots text-xl'></i> Modération <span class="ml-auto bg-red-500/20 text-red-500 text-[9px] px-2 py-0.5 rounded-full"><?= count($comments) ?></span>
             </button>
         </nav>
 
         <div class="p-6 border-t border-white/5 bg-black/20">
             <div class="flex items-center gap-3">
-                <?php 
-                    // Assure-toi que $organisateur est bien défini dans ton code PHP avant le HTML
-                    // Exemple: $photoPath = '../../public/uploads/' . $organisateur->getPhoto();
-                    // Ici, j'utilise une variable placeholder pour l'exemple
+                <?php   
                     $photoPath = isset($organisateur) ? '../../public/uploads/' . $organisateur->getPhoto() : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Organizer1';
                 ?>
                 <img id="side-avatar" src="<?php echo htmlspecialchars($photoPath); ?>" class="w-9 h-9 rounded-full border border-gray-700 object-cover">
-                <div class="flex-1"><p class="text-xs font-bold text-white">Atlas Events</p></div>
-                <a href="logout.php" class="text-gray-500 hover:text-red-500 transition-colors"><i class='bx bx-log-out text-xl'></i></a>
+                <div class="flex-1"><p class="text-xs font-bold text-white"><?= htmlspecialchars($organisateur->getName()) ?></p></div>
+                <a href="?action=logout" class="text-gray-500 hover:text-red-500 transition-colors"><i class='bx bx-log-out text-xl'></i></a>
             </div>
         </div>
     </aside>
@@ -334,7 +331,7 @@
             </div>
         </div>
 
-<div id="historique" class="section-content hidden fade-in">
+    <div id="historique" class="section-content hidden fade-in">
             <div class="glass-card rounded-[32px] overflow-hidden">
                 <div class="p-8 border-b border-white/5 flex justify-between items-center">
                     <h3 class="text-xl font-bold text-white">Historique des Matchs</h3>
@@ -352,35 +349,51 @@
                                 <th class="p-6">Lieu & Date</th>
                                 <th class="p-6">Tickets</th>
                                 <th class="p-6">Statut</th>
-                                <th class="p-6 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="text-xs font-bold divide-y divide-white/5">
-                            
+                            <?php
+                                $events = isset($organisateur) ? (new EventServices())->getEventsByOrganisateur($organisateur->getId()) : [];
+                                
+                                if (empty($events)) {
+                                    echo '<tr><td colspan="5" class="p-6 text-center text-gray-500">Aucun événement trouvé.</td></tr>';
+                                } else {
+                                    foreach ($events as $event) {
+
+                                        $equipeNom1 = $event['equipe1']->getNom();
+                                        $equipeNom2 = $event['equipe2']->getNom();
+                                        $pathLogo1 = '../../public/uploads_logo_equipe/' . $event['equipe1']->getLogo();
+                                        $pathLogo2 = '../../public/uploads_logo_equipe/' . $event['equipe2']->getLogo();
+                                        $dateEvent = date('d M Y', strtotime($event['event']->getDateEvent()));
+                                        $timeEvent = date('H:i', strtotime($event['event']->getDateEvent()));
+                                        $lieuEvent = $event['event']->getLieu();
+                                        $statusEvent = $event['event']->getStatus();
+
+                                ?>
                             <tr class="group hover:bg-white/[0.02] transition-colors">
                                 <td class="p-6">
                                     <div class="flex items-center gap-4">
                                         <div class="flex flex-col items-center gap-1 w-12">
-                                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Wydad_Athletic_Club_logo.png/180px-Wydad_Athletic_Club_logo.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="WAC">
-                                            <span class="text-[9px] text-gray-400">WAC</span>
+                                            <img src="<?= $pathLogo1 ?>" class="w-8 h-8 object-contain drop-shadow-lg" alt="WAC">
+                                            <span class="text-[9px] text-gray-400"><?= $equipeNom1 ?></span>
                                         </div>
                                         
                                         <div class="text-[#d4af37] font-black italic text-lg">VS</div>
                                         
                                         <div class="flex flex-col items-center gap-1 w-12">
-                                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Raja_Club_Athletic_Logo.svg/1200px-Raja_Club_Athletic_Logo.svg.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="RCA">
-                                            <span class="text-[9px] text-gray-400">RCA</span>
+                                            <img src="<?= $pathLogo2 ?>" class="w-8 h-8 object-contain drop-shadow-lg" alt="RCA">
+                                            <span class="text-[9px] text-gray-400"><?= $equipeNom2 ?></span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="p-6">
                                     <div class="flex flex-col gap-1">
-                                        <span class="text-white text-sm font-bold">15 Jan 2026</span>
+                                        <span class="text-white text-sm font-bold"><?= $dateEvent ?></span>
                                         <span class="text-[10px] text-gray-500 flex items-center gap-1">
-                                            <i class='bx bx-time'></i> 20:00
+                                            <i class='bx bx-time'></i> <?= $timeEvent ?>
                                         </span>
                                         <span class="text-[10px] text-[#d4af37] flex items-center gap-1 mt-1">
-                                            <i class='bx bx-map'></i> Stade Med V
+                                            <i class='bx bx-map'></i> <?= $lieuEvent ?>
                                         </span>
                                     </div>
                                 </td>
@@ -391,62 +404,17 @@
                                     <span class="text-[9px] text-gray-400">85% Vendu</span>
                                 </td>
                                 <td class="p-6">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] uppercase tracking-wide">
+                                    <span  id="textStatus" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] uppercase tracking-wide">
                                         <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                                        Confirmé
+                                        <?= htmlspecialchars($statusEvent) ?>
                                     </span>
                                 </td>
-                                <td class="p-6 text-right">
-                                    <button class="text-gray-400 hover:text-white transition p-2 hover:bg-white/10 rounded-lg"><i class='bx bx-edit-alt text-lg'></i></button>
-                                    <button class="text-gray-400 hover:text-red-500 transition p-2 hover:bg-red-500/10 rounded-lg"><i class='bx bx-trash text-lg'></i></button>
-                                </td>
+                                
                             </tr>
-
-                            <tr class="group hover:bg-white/[0.02] transition-colors">
-                                <td class="p-6">
-                                    <div class="flex items-center gap-4">
-                                        <div class="flex flex-col items-center gap-1 w-12">
-                                            <img src="https://upload.wikimedia.org/wikipedia/fr/c/c6/Logo_RS_Berkane.svg" class="w-8 h-8 object-contain drop-shadow-lg" alt="RSB">
-                                            <span class="text-[9px] text-gray-400">RSB</span>
-                                        </div>
-                                        
-                                        <div class="text-[#d4af37] font-black italic text-lg">VS</div>
-                                        
-                                        <div class="flex flex-col items-center gap-1 w-12">
-                                            <img src="https://upload.wikimedia.org/wikipedia/fr/4/4e/Fath_Union_Sport_de_Rabat.png" class="w-8 h-8 object-contain drop-shadow-lg" alt="FUS">
-                                            <span class="text-[9px] text-gray-400">FUS</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="p-6">
-                                    <div class="flex flex-col gap-1">
-                                        <span class="text-white text-sm font-bold">22 Jan 2026</span>
-                                        <span class="text-[10px] text-gray-500 flex items-center gap-1">
-                                            <i class='bx bx-time'></i> 18:00
-                                        </span>
-                                        <span class="text-[10px] text-[#d4af37] flex items-center gap-1 mt-1">
-                                            <i class='bx bx-map'></i> Stade Municipal
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="p-6">
-                                    <div class="w-full bg-white/10 rounded-full h-1.5 w-24 mb-1">
-                                        <div class="bg-[#d4af37] h-1.5 rounded-full" style="width: 10%"></div>
-                                    </div>
-                                    <span class="text-[9px] text-gray-400">10% Vendu</span>
-                                </td>
-                                <td class="p-6">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[10px] uppercase tracking-wide">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
-                                        En attente
-                                    </span>
-                                </td>
-                                <td class="p-6 text-right">
-                                    <button class="text-gray-400 hover:text-white transition p-2 hover:bg-white/10 rounded-lg"><i class='bx bx-edit-alt text-lg'></i></button>
-                                    <button class="text-gray-400 hover:text-red-500 transition p-2 hover:bg-red-500/10 rounded-lg"><i class='bx bx-trash text-lg'></i></button>
-                                </td>
-                            </tr>
-
+                            <?php
+                                    }
+                                }
+                            ?>
                         </tbody>
                     </table>
                 </div>
@@ -454,23 +422,87 @@
         </div>
 
         <div id="commentaires" class="section-content hidden fade-in">
-            <div class="space-y-4 max-w-3xl">
-                <div id="msg-1" class="glass-card p-5 rounded-2xl flex gap-4 items-center">
-                    <img src="https://i.pravatar.cc/100?img=1" class="w-10 h-10 rounded-full">
-                    <div class="flex-1"><h5 class="text-sm font-bold">Karim T.</h5><p class="text-xs text-gray-400">Accès parfait !</p></div>
-                    <button onclick="this.parentElement.remove()" class="text-red-500"><i class='bx bx-trash text-xl'></i></button>
+            <div class="space-y-4 max-w-4xl">
+                <div class="flex items-center justify-between mb-6 px-4">
+                    <h3 class="text-xl font-black uppercase italic text-white">Modération des <span class="text-[#d4af37]">Avis</span></h3>
+                    <span class="text-[10px] bg-white/5 border border-white/10 px-3 py-1 rounded-full text-gray-400 font-bold uppercase tracking-widest">
+                             Commentaires
+                    </span>
                 </div>
-                <div id="msg-2" class="glass-card p-5 rounded-2xl flex gap-4 items-center">
-                    <img src="https://i.pravatar.cc/100?img=5" class="w-10 h-10 rounded-full">
-                    <div class="flex-1"><h5 class="text-sm font-bold">Ahmed L.</h5><p class="text-xs text-gray-400">Prix chwia ghali...</p></div>
-                    <button onclick="this.parentElement.remove()" class="text-red-500"><i class='bx bx-trash text-xl'></i></button>
+
+                <?php foreach ($comments as $comment) {
+                    $path_image = '../../public/uploads/' . $comment->getUserPhoto();
+                    $note = $comment->getNote(); 
+                    $eventTitle =$comment->getEventTitle();
+                ?>
+                <div class="glass-card p-6 rounded-[24px] flex flex-col md:flex-row gap-6 items-start md:items-center group hover:border-[#d4af37]/30 transition-all duration-300">
+                    
+                    <div class="flex items-center gap-4 min-w-[200px]">
+                        <div class="relative">
+                            <img src="<?= $path_image ?>" class="w-12 h-12 rounded-full border-2 border-[#d4af37]/20 object-cover">
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[#050505] rounded-full"></div>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-black text-white uppercase tracking-tight"><?= htmlspecialchars($comment->getUserName()) ?></h5>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-2 border-l border-white/5 md:pl-6">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-[9px] font-black uppercase px-2 py-0.5 bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20 rounded-md">
+                                <i class='bx bx-football mr-1'></i> <?= htmlspecialchars($eventTitle) ?>
+                            </span>
+                            <div class="flex text-[#d4af37] text-xs">
+                                <?php for($i=1; $i<=5; $i++): ?>
+                                    <i class='bx <?= $i <= $note ? 'bxs-star' : 'bx-star' ?>'></i>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                        
+                        <p class="text-xs text-gray-300 leading-relaxed font-medium italic">
+                            "<?= htmlspecialchars($comment->getContenu()) ?>"
+                        </p>
+                        
+                        <div class="flex items-center gap-4 mt-2">
+                            <span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Posté <?= htmlspecialchars($comment->getDateCommentaire()) ?></span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 self-end md:self-center">
+                        <button title="Répondre" class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-[#d4af37] hover:text-black transition-all">
+                            <i class='bx bx-reply text-lg'></i>
+                        </button>
+                        <button onclick="confirmDeleteComment(this)" title="Supprimer" class="w-9 h-9 rounded-xl bg-red-500/5 flex items-center justify-center text-red-500 border border-red-500/10 hover:bg-red-500 hover:text-white transition-all">
+                            <i class='bx bx-trash text-lg'></i>
+                        </button>
+                    </div>
                 </div>
+                <?php } ?>
+
+                <?php if(empty($comments)): ?>
+                    <div class="glass-card p-12 rounded-[32px] text-center">
+                        <i class='bx bx-message-square-x text-5xl text-gray-700 mb-4'></i>
+                        <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">Aucun commentaire pour le moment</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
     </main>
 
     <script>
+        let textStatus = document.getElementById('textStatus');
+        if(textStatus.innerText.trim() === 'refuse'){
+            textStatus.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] uppercase tracking-wide";
+            textStatus.innerHTML = "<span class='w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse'></span> refuse";
+        }else if(textStatus.innerText.trim() === 'en_attente'){
+            textStatus.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-[10px] uppercase tracking-wide";
+            textStatus.innerHTML = "<span class='w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse'></span>en_attente";
+        }else if(textStatus.innerText.trim() === 'valide'){
+            textStatus.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/20 text-[10px] uppercase tracking-wide";
+            textStatus.innerHTML = "<span class='w-1.5 h-1.5 rounded-full bg-gray-500'></span> valide";
+        }
+
         // --- NAVIGATION ---
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
@@ -649,6 +681,8 @@
                 btn.disabled = false;
             });
         }
+    
+        
     </script>
 </body>
 </html>

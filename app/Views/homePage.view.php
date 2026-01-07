@@ -217,68 +217,80 @@
 
 
             <!-- Match Card 3 -->
-            <div class="relative group h-[500px] w-full rounded-[40px] overflow-hidden border border-white/5 card-hover reveal-on-scroll transition-all duration-700 hover:border-gold/30">
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=1000"
-                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
-                    alt="Stadium">
-                
-                <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/70 to-transparent opacity-95"></div>
+             <?php foreach ($events as $event): 
 
-                <div class="relative z-10 h-full p-10 flex flex-col justify-between">
-                    <div class="flex justify-between items-start">
-                        <span class="bg-gold/10 backdrop-blur-md text-gold text-[9px] font-black px-4 py-1.5 rounded-full tracking-[3px] border border-gold/20 uppercase">
-                            UCL Matchday
-                        </span>
-                        <div class="flex flex-col items-end gap-1">
-                            <div class="flex items-center gap-2 text-white text-xs font-black tracking-widest uppercase">
-                                <i class="bx bxs-calendar text-gold"></i>
-                                05 FEV 2026
+                $path_mignature= '../../public/uploads_mignature/' . $event['event']->getMignature();   
+                $path_equipe_1= '../../public/uploads_logo_equipe/' . $event['equipe1']->getLogo();
+                $path_equipe_2= '../../public/uploads_logo_equipe/' . $event['equipe2']->getLogo();
+                $date_event = new DateTime($event['event']->getDateEvent());
+                $formatted_date = $date_event->format('d M Y');
+                $formatted_time = $date_event->format('H:i');
+                ?>
+                <div class="relative group h-[500px] w-full rounded-[40px] overflow-hidden border border-white/5 card-hover reveal-on-scroll transition-all duration-700 hover:border-gold/30">
+                    <img src="<?php echo $path_mignature; ?>"
+                        class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
+                        alt="Stadium">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/70 to-transparent opacity-95"></div>
+
+                    <div class="relative z-10 h-full p-10 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-gold/10 backdrop-blur-md text-gold text-[9px] font-black px-4 py-1.5 rounded-full tracking-[3px] border border-gold/20 uppercase">
+                                UCL Matchday
+                            </span>
+                            <div class="flex flex-col items-end gap-1">
+                                <div class="flex items-center gap-2 text-white text-xs font-black tracking-widest uppercase">
+                                    <i class="bx bxs-calendar text-gold"></i>
+                                    <?= $formatted_date; ?>
+                                </div>
+                                <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase"><?= $formatted_time; ?> GMT+1</span>
                             </div>
-                            <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">21:00 GMT+1</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between py-10 relative">
-                        <div class="text-center w-1/3 transition-all duration-500 group-hover:-translate-x-3">
-                            <div class="relative mb-4 inline-block">
-                                <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png" 
-                                    class="w-20 h-20 object-contain relative z-10 drop-shadow-2xl" alt="PSG">
-                            </div>
-                            <h3 class="text-sm font-black tracking-[4px] uppercase text-white">PSG</h3>
-                        </div>
-
-                        <div class="flex flex-col items-center justify-center w-1/3">
-                            <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent mb-2"></div>
-                            <div class="text-4xl font-black italic gold-gradient tracking-tighter">VS</div>
-                            <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent mt-2"></div>
-                            <span class="text-[9px] uppercase tracking-[4px] text-gray-500 font-black mt-4">Prince Park</span>
                         </div>
 
-                        <div class="text-center w-1/3 transition-all duration-500 group-hover:translate-x-3">
-                            <div class="relative mb-4 inline-block">
-                                <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/66/AS_FAR_Logo.svg/1200px-AS_FAR_Logo.svg.png" 
-                                    class="w-20 h-20 object-contain relative z-10 drop-shadow-2xl" alt="AS FAR">
+                        <div class="flex items-center justify-between py-10 relative">
+                            <div class="text-center w-1/3 transition-all duration-500 group-hover:-translate-x-3">
+                                <div class="relative mb-4 inline-block">
+                                    <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <img src="<?php echo $path_equipe_1; ?>" 
+                                        class="w-20 h-20 object-contain relative z-10 drop-shadow-2xl" alt="PSG">
+                                </div>
+                                <h3 class="text-sm font-black tracking-[4px] uppercase text-white"><?= $event['equipe1']->getNom(); ?></h3>
                             </div>
-                            <h3 class="text-sm font-black tracking-[4px] uppercase text-white">AS FAR</h3>
-                        </div>
-                    </div>
 
-                    <div class="pt-6 border-t border-white/5">
-                        <button class="w-full group/btn relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 py-5 rounded-[20px] transition-all duration-500 hover:border-gold/50">
-                            <div class="absolute inset-0 bg-gold translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-500"></div>
-                            
-                            <div class="relative z-10 flex items-center justify-center gap-3">
-                                <span class="text-[11px] font-black uppercase tracking-[4px] text-white group-hover/btn:text-black transition-colors">
-                                    View Match Details
-                                </span>
-                                <i class='bx bx-right-top-arrow-circle text-xl text-gold group-hover/btn:text-black transition-colors'></i>
+                            <div class="flex flex-col items-center justify-center w-1/3">
+                                <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent mb-2"></div>
+                                <div class="text-4xl font-black italic gold-gradient tracking-tighter">VS</div>
+                                <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent mt-2"></div>
+                                <span class="text-[9px] uppercase tracking-[4px] text-gray-500 font-black mt-4"><?= $event['event']->getLieu(); ?></span>
                             </div>
-                        </button>
+
+                            <div class="text-center w-1/3 transition-all duration-500 group-hover:translate-x-3">
+                                <div class="relative mb-4 inline-block">
+                                    <div class="absolute inset-0 bg-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <img src="<?php echo $path_equipe_1; ?>" 
+                                        class="w-20 h-20 object-contain relative z-10 drop-shadow-2xl" alt="AS FAR">
+                                </div>
+                                <h3 class="text-sm font-black tracking-[4px] uppercase text-white"><?= $event['equipe2']->getNom(); ?></h3>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-white/5">
+                            <a href="EventDetailsController.php?id=<?= $event['event']->getId(); ?>       ">
+                                <button class="w-full group/btn relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 py-5 rounded-[20px] transition-all duration-500 hover:border-gold/50">
+                                    <div class="absolute inset-0 bg-gold translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-500"></div>
+                                    
+                                    <div class="relative z-10 flex items-center justify-center gap-3">
+                                        <span class="text-[11px] font-black uppercase tracking-[4px] text-white group-hover/btn:text-black transition-colors">
+                                            View Match Details
+                                        </span>
+                                        <i class='bx bx-right-top-arrow-circle text-xl text-gold group-hover/btn:text-black transition-colors'></i>
+                                    </div>
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </section>
 

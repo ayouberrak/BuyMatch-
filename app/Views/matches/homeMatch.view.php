@@ -65,32 +65,6 @@
 
     <?php require_once __DIR__ . '/../layouts/navbar.php'; ?>
 
-    <!-- Simuler des données (A REMPLACER PAR TA DB) -->
-    <?php
-    $matches = [
-        [
-            'teamA' => 'Real Madrid', 'logoA' => 'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png',
-            'teamB' => 'Barcelona', 'logoB' => 'https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1200px-FC_Barcelona_%28crest%29.svg.png',
-            'stade' => 'Bernabéu', 'time' => '21:00', 'price' => 850, 'status' => 'live', 'bg' => 'https://images.unsplash.com/photo-1510563800743-aed236490d08?q=80&w=1000'
-        ],
-        [
-            'teamA' => 'Wydad AC', 'logoA' => 'https://upload.wikimedia.org/wikipedia/fr/thumb/d/d4/Wydad_Athletic_Club_logo.png/800px-Wydad_Athletic_Club_logo.png',
-            'teamB' => 'Raja CA', 'logoB' => 'https://upload.wikimedia.org/wikipedia/en/thumb/8/81/Raja_Club_Athletic_Logo.svg/1200px-Raja_Club_Athletic_Logo.svg.png',
-            'stade' => 'Mohammed V', 'time' => '20:00', 'price' => 450, 'status' => 'soon', 'bg' => 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1000'
-        ],
-        [
-            'teamA' => 'PSG', 'logoA' => 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png',
-            'teamB' => 'Man City', 'logoB' => 'https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/1200px-Manchester_City_FC_badge.svg.png',
-            'stade' => 'Parc des Princes', 'time' => '19:45', 'price' => 1200, 'status' => 'soon', 'bg' => 'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?q=80&w=1000'
-        ],
-        [
-            'teamA' => 'Bayern', 'logoA' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/1200px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png',
-            'teamB' => 'Arsenal', 'logoB' => 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/1200px-Arsenal_FC.svg.png',
-            'stade' => 'Allianz Arena', 'time' => '21:00', 'price' => 900, 'status' => 'soon', 'bg' => 'https://images.unsplash.com/photo-1504159506876-f8338247a14a?q=80&w=1000'
-        ]
-    ];
-    ?>
-
     <main class="max-w-[1600px] mx-auto px-6 pt-32 pb-20">
         
         <!-- HEADER SECTION -->
@@ -172,12 +146,20 @@
             <!-- MATCH GRID -->
             <div class="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 
-                <?php foreach($matches as $index => $match): ?>
-                <div class="reveal match-card group relative rounded-[40px] overflow-hidden border border-white/5 bg-[#050505]" style="transition-delay: <?= $index * 100 ?>ms;">
+                <?php foreach ($events as $event): 
+
+                $path_mignature= '../../public/uploads_mignature/' . $event['event']->getMignature();   
+                $path_equipe_1= '../../public/uploads_logo_equipe/' . $event['equipe1']->getLogo();
+                $path_equipe_2= '../../public/uploads_logo_equipe/' . $event['equipe2']->getLogo();
+                $date_event = new DateTime($event['event']->getDateEvent());
+                $formatted_date = $date_event->format('d M Y');
+                $formatted_time = $date_event->format('H:i');
+                ?>
+                <div class="reveal match-card group relative rounded-[40px] overflow-hidden border border-white/5 bg-[#050505]" style="transition-delay: ms;">
                     
                     <!-- Background Image -->
                     <div class="absolute inset-0 z-0">
-                        <img src="<?= $match['bg'] ?>" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Stadium">
+                        <img src="<?= $path_mignature ?>" class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Stadium">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/50 to-transparent opacity-90"></div>
                     </div>
 
@@ -186,10 +168,10 @@
                         
                         <!-- Top Bar -->
                         <div class="flex justify-between items-start">
-                            <?php if($match['status'] === 'live'): ?>
+                            <?php if($event['event']->getStatus() === 'valide'): ?>
                                 <div class="flex items-center gap-2 bg-red-600/20 border border-red-500/50 backdrop-blur-md px-3 py-1.5 rounded-full">
                                     <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                    <span class="text-[8px] font-black text-red-500 uppercase tracking-widest">En Direct</span>
+                                    <span class="text-[8px] font-black text-red-500 uppercase tracking-widest">valide</span>
                                 </div>
                             <?php else: ?>
                                 <span class="bg-black/40 border border-white/10 backdrop-blur-md text-gray-300 text-[8px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest">Bientôt</span>
@@ -206,9 +188,9 @@
                                 <!-- Team A -->
                                 <div class="flex flex-col items-center gap-3 w-1/3">
                                     <div class="w-16 h-16 bg-white/5 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-[#d4af37]/30 shadow-2xl transition-all duration-500 group-hover:scale-110">
-                                        <img src="<?= $match['logoA'] ?>" class="w-10 h-10 object-contain drop-shadow-lg" alt="<?= $match['teamA'] ?>">
+                                        <img src="<?= $path_equipe_1 ?>" class="w-10 h-10 object-contain drop-shadow-lg" alt="<?= $event['equipe1']->getNom() ?>">
                                     </div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-center leading-tight"><?= $match['teamA'] ?></p>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-center leading-tight"><?= $event['equipe1']->getNom() ?></p>
                                 </div>
 
                                 <!-- VS -->
@@ -220,9 +202,9 @@
                                 <!-- Team B -->
                                 <div class="flex flex-col items-center gap-3 w-1/3">
                                     <div class="w-16 h-16 bg-white/5 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-[#d4af37]/30 shadow-2xl transition-all duration-500 group-hover:scale-110">
-                                        <img src="<?= $match['logoB'] ?>" class="w-10 h-10 object-contain drop-shadow-lg" alt="<?= $match['teamB'] ?>">
+                                        <img src="<?= $path_equipe_2 ?>" class="w-10 h-10 object-contain drop-shadow-lg" alt="<?= $event['equipe2']->getNom() ?>">
                                     </div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-center leading-tight"><?= $match['teamB'] ?></p>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-center leading-tight"><?= $event['equipe2']->getNom() ?></p>
                                 </div>
                             </div>
                         </div>
@@ -231,15 +213,11 @@
                         <div class="glass-panel rounded-[30px] p-5 border-white/5 group-hover:border-[#d4af37]/30 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
                             <div class="flex items-center gap-2 mb-4 text-gray-400">
                                 <i class='bx bxs-map text-[#d4af37]'></i>
-                                <span class="text-[9px] font-bold uppercase tracking-widest truncate"><?= $match['stade'] ?></span>
+                                <span class="text-[9px] font-bold uppercase tracking-widest truncate"><?= $event['event']->getLieu() ?></span>
                             </div>
 
                             <div class="flex items-center justify-between border-t border-white/5 pt-4">
-                                <div class="flex flex-col">
-                                    <span class="text-[8px] text-gray-500 font-bold uppercase tracking-wider">Prix Standard</span>
-                                    <span class="text-xl font-black italic text-white tracking-tighter"><?= $match['price'] ?> <span class="text-[9px] text-[#d4af37] not-italic">DH</span></span>
-                                </div>
-                                <a href="reservation.php?id=<?= $index ?>" class="bg-white text-black h-10 px-6 rounded-xl text-[9px] font-black uppercase tracking-[2px] flex items-center hover:bg-[#d4af37] hover:scale-105 transition-all shadow-lg shadow-black/50">
+                                <a href="DetailsController.php?id=<?= $event['event']->getId() ?>" class="bg-white text-black h-10 px-6 rounded-xl text-[9px] font-black uppercase tracking-[2px] flex items-center hover:bg-[#d4af37] hover:scale-105 transition-all shadow-lg shadow-black/50">
                                     Réserver
                                 </a>
                             </div>

@@ -79,18 +79,14 @@
     <?php require_once __DIR__ . '/../layouts/navbar.php'; ?>
 
     <!-- Données du Match (Simulées) -->
+
     <?php
-        $match_data = [
-            'teamA' => 'Real Madrid',
-            'logoA' => 'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png',
-            'teamB' => 'Wydad AC',
-            'logoB' => 'https://upload.wikimedia.org/wikipedia/fr/thumb/d/d4/Wydad_Athletic_Club_logo.png/800px-Wydad_Athletic_Club_logo.png',
-            'date' => '15 Jan 2026',
-            'time' => '20:45',
-            'stadium' => 'Grand Stade de Marrakech',
-            'weather' => '18°C',
-            'bg_image' => 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2000'
-        ];
+        $path_mignature= '../../public/uploads_mignature/' . $event['event']->getMignature();   
+        $path_equipe_1= '../../public/uploads_logo_equipe/' . $event['equipe1']->getLogo();
+        $path_equipe_2= '../../public/uploads_logo_equipe/' . $event['equipe2']->getLogo();
+        $date_event = new DateTime($event['event']->getDateEvent());
+        $formatted_date = $date_event->format('d M Y');
+        $formatted_time = $date_event->format('H:i');
     ?>
 
     <!-- HERO HEADER -->
@@ -270,6 +266,7 @@
 
     <!-- INTERACTIVE SCRIPT -->
     <script>
+
         // State
         let currentPrice = 3500;
         let quantity = 1;

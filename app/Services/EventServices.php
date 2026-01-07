@@ -38,4 +38,13 @@ class EventServices {
     {
         return $this->eventRepository->updateEventStatus($eventId, $newStatus);
     }
+
+    public function getAllEvents(): array
+    {
+        return $this->eventRepository->getAllEvents();
+    }
+    public function getEventById(int $id): array
+    {
+        return $this->eventRepository->getEventsById($id);
+    }
 }

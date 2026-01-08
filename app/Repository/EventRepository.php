@@ -188,11 +188,18 @@ class EvnetRepository{
         $stmt->execute([':id' => $eventId]);
 
 
-        $events = [];
+
         $equipeRepo = new EquipeRepository();
 
 
-        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) {
+           return null;
+        }
+
+
+       if ($data) {
             $event = new Event(
                 $data['id'],
                 $data['titre'],
@@ -208,13 +215,13 @@ class EvnetRepository{
 
             $equipe1 = $equipeRepo->findById($event->getEquipe1Id());
             $equipe2 = $equipeRepo->findById($event->getEquipe2Id());
-            $events[] = [
-                'event' => $event,
-                'equipe1' => $equipe1,
-                'equipe2' => $equipe2
-            ];
 
-        return $events;
+
+        return [
+            'event' => $event,
+            'equipe1' => $equipe1,
+            'equipe2' => $equipe2
+        ];
     }
 
 }

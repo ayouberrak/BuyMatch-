@@ -3,351 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BuyMatch | Réservation Exclusive</title>
+    <title>BuyMatch | The Elite Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../public/assets/css/home.css">
-    <link rel="stylesheet" href="../../../public/assets/css/navbar.css">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@200;400;900&display=swap');
         
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #020202; 
-            color: white; 
-            overflow-x: hidden;
+        body { font-family: 'Outfit', sans-serif; background: #000; color: white; overflow-x: hidden; }
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Animation Background Glow */
+        .bg-glow {
+            position: fixed; width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            top: -10vw; right: -10vw; z-index: -1; animation: pulse 10s infinite alternate;
         }
 
-        /* Glassmorphism */
-        .glass-panel { 
-            background: rgba(10, 10, 10, 0.6); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        @keyframes pulse { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.2); opacity: 0.8; } }
+
+        /* Hexagonal Seats Nadiyin */
+        .seat {
+            width: 35px; height: 40px; clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            background: rgba(255, 255, 255, 0.03); cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .seat:hover:not(.occupied) { background: #D4AF37; color: black; transform: scale(1.2) rotate(10deg); box-shadow: 0 0 20px #D4AF37; }
+        .seat.selected { background: #D4AF37; color: black; box-shadow: 0 0 30px #D4AF37; transform: scale(1.1); }
+        .seat.occupied { background: #111; opacity: 0.2; cursor: not-allowed; }
+
+        /* Premium Ticket Glass */
+        .ticket-glass {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.07);
+            position: relative;
+        }
+        .ticket-glass::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.03) 50%, transparent 100%);
         }
 
-        /* Gold Gradient Text */
-        .gold-text {
-            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .gold-shimmer {
+            background: linear-gradient(90deg, #8E6D13, #D4AF37, #FCF6BA, #D4AF37, #8E6D13);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
         }
-
-        /* Interactive Stadium Map */
-        .stadium-path {
-            fill: rgba(255, 255, 255, 0.05);
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 1.5;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .stadium-path:hover {
-            fill: rgba(212, 175, 55, 0.3);
-            stroke: #d4af37;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
-        }
-
-        .stadium-path.selected {
-            fill: #d4af37;
-            stroke: white;
-            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
-        }
-
-        /* Custom Quantity Selector */
-        .qty-btn {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-        }
-        .qty-btn:hover { background: #d4af37; color: black; }
-
-        /* Animations */
-        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes shine { to { background-position: 200% center; } }
     </style>
 </head>
-<body class="pb-20 bg-[#020202]">
+<body class="py-10">
+    <div class="bg-glow"></div>
 
-    <?php require_once __DIR__ . '/../layouts/navbar.php'; ?>
+        <?php include_once __DIR__ . '/../layouts/navbar.php'; ?>
 
-    <!-- Données du Match (Simulées) -->
-
-    <?php
-        $path_mignature= '../../public/uploads_mignature/' . $event['event']->getMignature();   
-        $path_equipe_1= '../../public/uploads_logo_equipe/' . $event['equipe1']->getLogo();
-        $path_equipe_2= '../../public/uploads_logo_equipe/' . $event['equipe2']->getLogo();
-        $date_event = new DateTime($event['event']->getDateEvent());
-        $formatted_date = $date_event->format('d M Y');
-        $formatted_time = $date_event->format('H:i');
-    ?>
-
-    <!-- HERO HEADER -->
-    <header class="relative h-[60vh] w-full overflow-hidden flex items-center justify-center mt-0">
-        <div class="absolute inset-0 z-0">
-            <img src="<?= $match_data['bg_image'] ?>" class="w-full h-full object-cover opacity-30 scale-105 animate-[pulse_10s_ease-in-out_infinite]" alt="Stadium">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/50 to-transparent"></div>
-        </div>
+    <main class="max-w-6xl mx-auto px-6">
         
-        <div class="relative z-10 text-center px-4 w-full max-w-5xl fade-in-up">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/10 mb-8 backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse"></span>
-                <span class="text-[9px] font-black tracking-[3px] text-[#d4af37] uppercase">Match de la semaine</span>
+        <section class="mb-16 text-center">
+            <div class="inline-flex items-center gap-4 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-8">
+                <span class="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
+                <span class="text-[10px] font-black uppercase tracking-[4px]">Live Selection Phase</span>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
-                <!-- Team A -->
-                <div class="flex flex-col items-center group">
-                    <img src="<?= $match_data['logoA'] ?>" class="w-24 md:w-36 drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-500" alt="<?= $match_data['teamA'] ?>">
-                    <h2 class="mt-4 font-black text-xl md:text-3xl tracking-tighter uppercase"><?= $match_data['teamA'] ?></h2>
-                </div>
-                
-                <!-- VS -->
-                <div class="flex flex-col items-center">
-                    <span class="text-5xl md:text-7xl font-black italic text-white/10 select-none leading-none">VS</span>
-                    <div class="mt-[-15px] bg-white/5 border border-white/10 px-5 py-1.5 rounded-xl backdrop-blur-xl">
-                        <span class="gold-text font-black tracking-[4px] text-sm">FINAL 2026</span>
-                    </div>
-                </div>
-
-                <!-- Team B -->
-                <div class="flex flex-col items-center group">
-                    <img src="<?= $match_data['logoB'] ?>" class="w-24 md:w-36 drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform duration-500" alt="<?= $match_data['teamB'] ?>">
-                    <h2 class="mt-4 font-black text-xl md:text-3xl tracking-tighter uppercase"><?= $match_data['teamB'] ?></h2>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-6 -mt-16 relative z-20 mb-20">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <?php
+                $path_equipe_1= '../../public/uploads_logo_equipe/' . $equipe1Data->getLogo();
+                $path_equipe_2= '../../public/uploads_logo_equipe/' . $equipe2Data->getLogo();
+            ?>
             
-            <!-- LEFT COLUMN: INFO & MAP -->
-            <div class="lg:col-span-2 space-y-6 fade-in-up delay-100">
-                
-                <!-- Match Info Bar -->
-                <div class="glass-panel rounded-[30px] p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="border-r border-white/5 pr-4">
-                        <p class="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">Coup d'envoi</p>
-                        <p class="text-white font-bold text-lg flex items-center gap-1"><i class='bx bx-time text-[#d4af37]'></i> <?= $match_data['time'] ?></p>
-                    </div>
-                    <div class="border-r border-white/5 pr-4 md:pl-4">
-                        <p class="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">Date</p>
-                        <p class="text-white font-bold text-lg"><?= $match_data['date'] ?></p>
-                    </div>
-                    <div class="border-r border-white/5 pr-4 md:pl-4">
-                        <p class="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">Stade</p>
-                        <p class="text-white font-bold text-lg truncate">Marrakech</p>
-                    </div>
-                    <div class="md:pl-4">
-                        <p class="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">Météo</p>
-                        <p class="text-white font-bold text-lg flex items-center gap-1"><i class='bx bx-sun text-[#d4af37]'></i> <?= $match_data['weather'] ?></p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-10 md:gap-24">
+                <div class="flex flex-col items-center">
+                    <img src="<?php echo htmlspecialchars($path_equipe_1); ?>" class="w-24 drop-shadow-[0_0_30px_rgba(255,0,0,0.2)]">
+                    <h2 class="mt-4 font-black text-2xl tracking-tighter"><?php echo htmlspecialchars($equipe1Data->getNom()); ?></h2>
+                </div>
+                <div class="text-center">
+                    <p class="font-space text-5xl font-black italic gold-shimmer tracking-tighter">V S</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-[5px] mt-2">Final 2026</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="<?php echo htmlspecialchars($path_equipe_2); ?>" class="w-24 drop-shadow-[0_0_30px_rgba(0,128,0,0.2)]">
+                    <h2 class="mt-4 font-black text-2xl tracking-tighter"><?php echo htmlspecialchars($equipe2Data->getNom()); ?></h2>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <div class="lg:col-span-8 space-y-8">
+                <div class="ticket-glass rounded-[35px] p-8">
+                    <h3 class="font-space text-[11px] font-black uppercase tracking-[3px] text-gold/60 mb-8">01. Select Category</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <?php foreach ($categories as $category): ?>
+                            <button onclick="updateData('<?php echo htmlspecialchars($category->getId()); ?>','<?php echo htmlspecialchars($category->getNom()); ?>', '<?php echo htmlspecialchars($category->getPrice()); ?>', 'Zone A', this)" class="p-6 rounded-[25px] border border-gold/30 bg-gold/5 text-left transition-all active-cat">
+                                <p class="text-[9px] font-black text-gold uppercase tracking-widest"><?php echo htmlspecialchars($category->getNom()); ?></p>
+                                <p class="text-2xl font-black mt-1"><?php echo htmlspecialchars($category->getPrice()); ?> <span class="text-xs opacity-50">DH</span></p>
+                            </button>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
-                <!-- Interactive Stadium Map -->
-                <div class="glass-panel rounded-[40px] p-8 md:p-10 relative overflow-hidden group">
-                    <div class="flex justify-between items-end mb-8 relative z-10">
-                        <div>
-                            <h3 class="text-2xl font-black uppercase tracking-tighter">Plan du <span class="gold-text italic">Stade</span></h3>
-                            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Cliquez sur une zone pour réserver</p>
+                <div class="ticket-glass rounded-[35px] p-8 relative">
+                    <h3 class="font-space text-[11px] font-black uppercase tracking-[3px] text-gold/60 mb-8">02. Pick Your Seat</h3>
+                    <div id="seat-map" class="grid grid-cols-6 md:grid-cols-10 gap-3 justify-items-center mb-10">
                         </div>
-                        
-                        <!-- Legend -->
-                        <div class="flex gap-4">
-                            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#d4af37]"></span><span class="text-[9px] font-bold text-gray-400 uppercase">VIP</span></div>
-                            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-white/20"></span><span class="text-[9px] font-bold text-gray-400 uppercase">Standard</span></div>
-                        </div>
-                    </div>
-
-                    <!-- SVG Map -->
-                    <div class="relative w-full aspect-video mx-auto bg-[#0a0a0a] rounded-[30px] border border-white/5 p-4 shadow-inner">
-                        <svg viewBox="0 0 800 500" class="w-full h-full drop-shadow-2xl">
-                            <!-- Pitch -->
-                            <rect x="220" y="160" width="360" height="180" rx="8" fill="#1a1a1a" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
-                            <line x1="400" y1="160" x2="400" y2="340" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
-                            <circle cx="400" cy="250" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
-                            
-                            <!-- Zones -->
-                            <!-- VIP North -->
-                            <path d="M 220 140 L 580 140 L 600 80 L 200 80 Z" 
-                                  class="stadium-path" data-name="VIP Prestige Nord" data-price="2500" />
-                            
-                            <!-- Standard East -->
-                            <path d="M 600 160 L 600 340 L 720 380 L 720 120 Z" 
-                                  class="stadium-path" data-name="Tribune Est - Fan Zone" data-price="450" />
-                            
-                            <!-- Standard West -->
-                            <path d="M 200 160 L 200 340 L 80 380 L 80 120 Z" 
-                                  class="stadium-path" data-name="Tribune Ouest" data-price="600" />
-                            
-                            <!-- VVIP South -->
-                            <path d="M 220 360 L 580 360 L 600 420 L 200 420 Z" 
-                                  class="stadium-path selected" data-name="VVIP South Box" data-price="3500" />
-                        </svg>
-
-                        <!-- Tooltip Flottant -->
-                        <div id="tooltip" class="absolute hidden top-0 left-0 bg-black/80 backdrop-blur-md border border-[#d4af37] px-4 py-2 rounded-xl pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2 z-50">
-                            <p id="tooltip-name" class="text-[9px] font-black uppercase text-[#d4af37] tracking-widest"></p>
-                            <p id="tooltip-price" class="text-white font-bold"></p>
-                        </div>
-                    </div>
+                    <div class="w-full h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent"></div>
+                    <p class="text-center text-[8px] font-black text-gold/30 uppercase tracking-[10px] mt-4 italic">Terrain / Pitch Side</p>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: BOOKING FORM (Sticky) -->
-            <aside class="relative fade-in-up delay-200">
-                <div class="glass-panel rounded-[40px] p-8 sticky top-28 border-[#d4af37]/20 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div class="lg:col-span-4 sticky top-10">
+                <div class="ticket-glass rounded-[40px] p-10 border-gold/20">
+                    <h4 class="font-space text-sm font-black italic tracking-widest mb-10">CHECKOUT RECAP</h4>
                     
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-black uppercase tracking-tighter">Réserver <span class="gold-text italic">Maintenant</span></h3>
-                        <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">Finalisation sécurisée</p>
+                    <div class="space-y-6 mb-12">
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-4">
+                            <span class="text-gray-500 font-bold text-[10px] uppercase">Access</span>
+                            <span id="res-cat" class="font-black uppercase"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-4">
+                            <span class="text-gray-500 font-bold text-[10px] uppercase">Seat</span>
+                            <span id="res-seat" class="font-black text-gold">NOT SELECTED</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-500 font-bold text-[10px] uppercase">Price</span>
+                            <span class="text-3xl font-black italic"><span id="res-price"></span><span class="text-sm ml-1 opacity-50 font-normal">DH</span></span>
+                        </div>
                     </div>
-                    
-                    <form action="process_booking.php" method="POST" class="space-y-6">
-                        
-                        <!-- Zone Selection Display -->
-                        <div class="bg-white/5 rounded-2xl p-4 border border-white/5">
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Zone Sélectionnée</p>
-                            <div class="flex justify-between items-center">
-                                <span id="selected-zone-name" class="font-black text-white uppercase text-sm">VVIP South Box</span>
-                                <i class='bx bxs-check-circle text-[#d4af37]'></i>
-                            </div>
-                        </div>
 
-                        <!-- Quantity Selector -->
-                        <div class="space-y-2">
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Nombre de billets</p>
-                            <div class="flex items-center justify-between bg-black/40 rounded-2xl p-2 border border-white/10">
-                                <button type="button" onclick="updateQty(-1)" class="qty-btn"><i class='bx bx-minus'></i></button>
-                                <span id="qty-display" class="font-black text-xl w-10 text-center">1</span>
-                                <button type="button" onclick="updateQty(1)" class="qty-btn"><i class='bx bx-plus'></i></button>
-                                <input type="hidden" name="quantity" id="qty-input" value="1">
-                            </div>
-                        </div>
-
-                        <!-- Total Price -->
-                        <div class="pt-6 border-t border-white/10">
-                            <div class="flex justify-between items-end">
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Estimé</span>
-                                <div class="text-right">
-                                    <span id="total-price" class="text-4xl font-black text-white italic tracking-tighter">3500</span>
-                                    <span class="text-[10px] font-black text-[#d4af37] uppercase ml-1">MAD</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-[11px] tracking-[3px] hover:bg-[#d4af37] hover:scale-[1.02] transition-all duration-300 shadow-xl group flex items-center justify-center gap-2">
-                            <span>Payer la commande</span>
-                            <i class='bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform'></i>
-                        </button>
-
-                        <div class="flex justify-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                            <i class='bx bxl-visa text-2xl'></i>
-                            <i class='bx bxl-mastercard text-2xl'></i>
-                            <i class='bx bxs-bank text-2xl'></i>
-                        </div>
-                    </form>
+                    <button onclick="sendData(<?= $eventId ?>)" class="w-full bg-white text-black py-5 rounded-2xl font-black uppercase text-[10px] tracking-[5px] hover:bg-gold transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 group">
+                        Confirm Purchase <i class='bx bxs-bolt-circle text-xl group-hover:rotate-180 transition-transform'></i>
+                    </button>
                 </div>
-            </aside>
-
+            </div>
         </div>
+
+        <div id="final-ticket" class="mt-32 opacity-10 blur-xl transition-all duration-1000 transform translate-y-20">
+            <p class="text-center text-[10px] font-black text-gray-600 uppercase tracking-[20px] mb-12 italic">Your Official Digital Pass</p>
+            
+            <div class="ticket-glass rounded-[60px] flex flex-col md:flex-row overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(212,175,55,0.05)] relative">
+                
+                <div class="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
+                    <h1 class="text-9xl font-black italic">MATCH DAY</h1>
+                </div>
+
+                <div class="flex-[3] p-10 md:p-14 border-r border-dashed border-white/10 relative">
+                    
+                    <div class="absolute -top-10 -left-10 w-40 h-40 bg-gold/5 rounded-full blur-3xl"></div>
+                    
+                    <div class="flex flex-wrap justify-between items-center mb-12 gap-6">
+                        <div class="flex items-center gap-4 bg-white/5 p-3 rounded-3xl border border-white/5">
+                            <img src="<?php echo htmlspecialchars($path_equipe_1); ?>" class="w-10 h-10 object-contain">
+                            <span class="font-black italic text-sm tracking-tighter"><?php echo htmlspecialchars($equipe1Data->getNom()); ?></span>
+                            <span class="text-gold font-black mx-1 text-xs italic">VS</span>
+                            <span class="font-black italic text-sm tracking-tighter"><?php echo htmlspecialchars($equipe2Data->getNom()); ?></span>
+                            <img src="<?php echo htmlspecialchars($path_equipe_2); ?>" class="w-10 h-10 object-contain">
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-gold uppercase tracking-[4px]">28 JAN 2026</p>
+                            <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-1 italic">Stade Mohammed V</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-12">
+                        <span class="bg-gold/10 text-gold border border-gold/20 px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-widest mb-3 inline-block">Confirmed Access</span>
+                        <h2 id="t-cat" class="font-space text-5xl md:text-7xl font-black gold-shimmer italic uppercase leading-none tracking-tighter"></h2>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-10">
+                        <div>
+                            <p class="text-[8px] text-gray-500 font-black uppercase mb-2 tracking-widest">Siège</p>
+                            <p id="t-seat" class="font-black text-xl text-gold italic">--</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] text-gray-500 font-black uppercase mb-2 tracking-widest">Zone</p>
+                            <p id="t-zone" class="font-black text-sm uppercase italic">Zone A</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] text-gray-500 font-black uppercase mb-2 tracking-widest">Porte</p>
+                            <p id="t-gate" class="font-black text-sm uppercase italic">Gate 12/A</p>
+                        </div>
+                        <div>
+                            <p class="text-[8px] text-gray-500 font-black uppercase mb-2 tracking-widest">Prix Total</p>
+                            <p class="font-black text-xl italic"><span id="t-price">1200</span> <span class="text-[10px] opacity-50">DH</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-10 md:p-14 flex flex-col items-center justify-center bg-white/[0.02] relative">
+                    <div class="absolute -top-5 left-[-20px] w-10 h-10 bg-[#000] rounded-full hidden md:block border-r border-white/10"></div>
+                    <div class="absolute -bottom-5 left-[-20px] w-10 h-10 bg-[#000] rounded-full hidden md:block border-r border-white/10"></div>
+                    
+                    <div class="bg-white p-5 rounded-[35px] shadow-[0_0_50px_rgba(255,255,255,0.1)] mb-8 transform hover:scale-105 transition-transform duration-500">
+                        <i class='bx bx-qr text-8xl text-black'></i>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[9px] font-black text-gray-500 tracking-[5px] uppercase mb-1">Verify Entry</p>
+                        <p class="text-[7px] font-mono opacity-30">REF: BM-<?php echo time(); ?>-XP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <?php require_once __DIR__ . '/../layouts/footer.php'; ?>
+    <?php include_once __DIR__ . '/../layouts/footer.php'; ?>
 
-    <!-- INTERACTIVE SCRIPT -->
     <script>
+        const grid = document.getElementById('seat-map');
 
-        // State
-        let currentPrice = 3500;
-        let quantity = 1;
+        let selectedCategoryId = null;
 
-        // Elements
-        const paths = document.querySelectorAll('.stadium-path');
-        const tooltip = document.getElementById('tooltip');
-        const tName = document.getElementById('tooltip-name');
-        const tPrice = document.getElementById('tooltip-price');
-        const zoneNameDisplay = document.getElementById('selected-zone-name');
-        const priceDisplay = document.getElementById('total-price');
-        const qtyDisplay = document.getElementById('qty-display');
-        const qtyInput = document.getElementById('qty-input');
 
-        // Update Total Logic
-        function updateTotal() {
-            const total = currentPrice * quantity;
-            // Animation Number
-            animateValue(priceDisplay, parseInt(priceDisplay.innerText), total, 300);
-        }
 
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        // Quantity Logic
-        window.updateQty = (change) => {
-            let newQty = quantity + change;
-            if(newQty >= 1 && newQty <= 10) {
-                quantity = newQty;
-                qtyDisplay.innerText = quantity;
-                qtyInput.value = quantity;
-                updateTotal();
+        function generateSeats() {
+            grid.innerHTML = '';
+            for(let i=1; i<=30; i++) {
+                const isOcc = Math.random() < 0.2;
+                const s = document.createElement('div');
+                s.className = `seat ${isOcc ? 'occupied' : ''}`;
+                s.innerText = i;
+                if(!isOcc) s.onclick = () => selectSeat(i, s);
+                grid.appendChild(s);
             }
-        };
+        }
 
-        // Stadium Map Interaction
-        paths.forEach(path => {
-            // Hover Tooltip
-            path.addEventListener('mousemove', (e) => {
-                tooltip.classList.remove('hidden');
-                tooltip.style.left = e.pageX + 'px';
-                tooltip.style.top = e.pageY - 20 + 'px'; // Offset
-                tName.innerText = path.getAttribute('data-name');
-                tPrice.innerText = path.getAttribute('data-price') + ' MAD';
+        function selectSeat(num, el) {
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            document.getElementById('res-seat').innerText = `${num}`;
+            document.getElementById('t-seat').innerText = num;
+
+            // NADI ANIMATION FOR TICKET
+            const ticket = document.getElementById('final-ticket');
+            ticket.classList.remove('opacity-10', 'blur-xl', 'translate-y-20');
+            ticket.classList.add('opacity-100', 'blur-0', 'translate-y-0');
+        }
+
+        function updateData(id, cat, price, zone, btn) {
+                selectedCategoryId = id;
+
+            document.querySelectorAll('button').forEach(b => {
+                b.classList.add('opacity-40');
+                b.classList.remove('border-gold/30', 'bg-gold/5');
             });
+            btn.classList.remove('opacity-40');
+            btn.classList.add('border-gold/30', 'bg-gold/5');
 
-            path.addEventListener('mouseleave', () => {
-                tooltip.classList.add('hidden');
+            document.getElementById('res-cat').innerText = cat;
+            document.getElementById('res-price').innerText = price;
+            document.getElementById('t-cat').innerText = cat;
+            document.getElementById('t-price').innerText = price;
+            document.getElementById('t-zone').innerText = zone;
+            
+            generateSeats();
+        }
+
+        generateSeats();
+
+
+        function sendData(idEvents) {
+            const category = document.getElementById('res-cat').innerText;
+            const seat = document.getElementById('res-seat').innerText;
+            const price = document.getElementById('res-price').innerText;
+
+
+            // let idCategory;
+            // if(category == "Standard") {
+            //     idCategory = 5;
+            // }else if(category == "VIP") {
+            //     idCategory = 4;
+            // }else if(category == "Premium") {
+            //     idCategory = 6;
+            // }
+
+            if(seat === 'NOT SELECTED') {
+                alert('is not select ');
+                return;
+            }
+            console.log({ selectedCategoryId, seat, price });
+
+            fetch('../api/Reserve.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({idEvents,selectedCategoryId, seat, price })
+            }) 
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                })
+            .catch(error => {
+                console.log('Error', error);
             });
-
-            // Click Selection
-            path.addEventListener('click', function() {
-                // Remove active class from all
-                paths.forEach(p => p.classList.remove('selected'));
-                // Add to current
-                this.classList.add('selected');
-                
-                // Update Data
-                currentPrice = parseInt(this.getAttribute('data-price'));
-                zoneNameDisplay.innerText = this.getAttribute('data-name');
-                
-                // Flash animation on zone name
-                zoneNameDisplay.parentElement.classList.add('bg-white/10');
-                setTimeout(() => zoneNameDisplay.parentElement.classList.remove('bg-white/10'), 200);
-
-                updateTotal();
-            });
-        });
+        }
     </script>
-    <script src="../../../public/assets/js/home.js"></script>
-    <script src="../../../public/assets/js/nabar.js"></script>
-
 </body>
 </html>

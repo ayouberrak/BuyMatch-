@@ -33,6 +33,7 @@ class LoginController
 
             $_SESSION['user_id'] = $user->getId();
             $_SESSION['role'] = $user->getRole();
+            $_SESSION['email'] = $user->getEmail();
 
             switch ($user->getRole()) {
                 case 'admin':

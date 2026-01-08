@@ -4,18 +4,21 @@ class Reservation {
     private ?int $id;
     private int $event_id;
     private int $user_id;
+    private int $category_id;
+    private string $nbr_place;
+    private float $price;
     private string $date_reservation;
-    private int $prix_total;
-    private int $quantite;
 
-    public function __construct(?int $id, int $event_id, int $user_id, string $date_reservation, int $quantite, int $prix_total)
+
+    public function __construct(?int $id, int $event_id, int $user_id, string $date_reservation,int $category_id, string $nbr_place, float $price)
     {
         $this->id = $id;
         $this->event_id = $event_id;
         $this->user_id = $user_id;
         $this->date_reservation = $date_reservation;
-        $this->quantite = $quantite;
-        $this->prix_total = $prix_total;
+        $this->category_id = $category_id;
+        $this->nbr_place = $nbr_place;
+        $this->price = $price;
     }
 
     public function getId(): ?int
@@ -38,13 +41,17 @@ class Reservation {
         return $this->date_reservation;
     }
 
-    public function getPrixTotal(): int
+    public function getCategoryId(): int
     {
-        return $this->prix_total;
+        return $this->category_id;
     }
-    public function getQuantite(): int
+    public function getNbrPlace(): string
     {
-        return $this->quantite;
+        return $this->nbr_place;
     }
-    
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
 }

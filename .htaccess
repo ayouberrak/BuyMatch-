@@ -1,0 +1,1 @@
+ErrorDocument 404 /BuyMatch-/app/Views/error/404.php

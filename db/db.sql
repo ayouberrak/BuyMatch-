@@ -58,3 +58,30 @@ CREATE TABLE billets (
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
     FOREIGN KEY (categorie_id) REFERENCES categories(id)
 );
+
+
+
+CREATE VIEW eventDetails AS
+SELECT e.id,e.titre,e.date_event,e.lieu,e.statut,u.nom ,ea.nom ,eb.nom
+FROM evenements e
+JOIN users u ON e.organisateur_id = u.id
+JOIN equipes ea ON e.equipe_a_id = ea.id
+JOIN equipes eb ON e.equipe_b_id = eb.id;
+
+
+
+
+DELIMITER $$
+CREATE PROCEDURE createRes (
+    IN p_user_id INT,
+    IN p_event_id INT,
+    IN p_total_prix DECIMAL(10,2)
+)
+BEGIN
+    INSERT INTO reservations (user_id, event_id, total_prix)
+    VALUES (p_user_id, p_event_id, p_total_prix);
+
+    SELECT LAST_INSERT_ID() AS reservation_id;
+END$$
+DELIMITER ;
+CALL create_reservation(1, 3, 250.00);
